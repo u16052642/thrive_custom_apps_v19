@@ -1,0 +1,937 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates id="template" xml:space="preserve">
+    <t t-name="CRMDashboardMain">
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap"
+        />
+        <div class="container-fluid p-md-4 p-3 dashboard-main">
+            <div
+                class="dashboard-title-wrap d-flex justify-content-between align-items-center"
+            >
+                <h4
+                    class="dashboard-title fw-semibold m-0"
+                    style="font-size: 24px;"
+                >CRM and Sales Dashboard</h4>
+            </div>
+            <div
+                class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center my-4 gap-4 gap-md-0"
+            >
+                <h1
+                    class="h2 m-0 lh-32 px"
+                    style="font-size: 32px; font-weight: 700;"
+                >Welcome Back, <t t-out="state.currentUser.name" />
+                </h1>
+                <div class="d-flex flex-wrap justify-content-end gap-2 align-items-end">
+                    <div class="dropdown">
+                        <button
+                            class="form-select"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <t t-esc="getSelectedSalespersonName()" />
+                        </button>
+                        <ul class="dropdown-menu p-2 filter-dropdown">
+                            <t t-foreach="state.salesPersons" t-as="sp" t-key="sp.id">
+                                <li class="dropdown-item">
+                                    <div
+                                        t-att-class="state.salesperson_id === sp.id ? 'custom-radio active' : 'custom-radio'"
+                                        t-att-data-id="sp.id"
+                                        t-on-click="OnSalespersonSelect"
+                                    >
+                                        <span>
+                                            <t t-esc="sp.name" />
+                                        </span>
+                                    </div>
+                                </li>
+                            </t>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button
+                            class="form-select"
+                            type="button"
+                            id="periodDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <t t-esc="getPeriodLabel2(state.period)" />
+                        </button>
+                        <ul
+                            class="dropdown-menu p-2 filter-dropdown"
+                            aria-labelledby="periodDropdown"
+                        >
+                            <t
+                                t-foreach="[
+                                {'label': 'Today', 'value': 'today'},
+                                {'label': 'Yesterday', 'value': 'yesterday'},
+                                {'label': 'This Week', 'value': 'week'},
+                                {'label': 'Last Week', 'value': 'last_week'},
+                                {'label': 'This Month', 'value': 'month'},
+                                {'label': 'Last Month', 'value': 'last_month'},
+                                {'label': 'This Quarter', 'value': 'quarter'},
+                                {'label': 'Last Quarter', 'value': 'last_quarter'},
+                                {'label': 'This Year', 'value': 'year'},
+                                {'label': 'Last Year', 'value': 'last_year'},
+                            ]"
+                                t-as="period"
+                                t-key="period.value"
+                            >
+                                <li class="dropdown-item">
+                                    <div
+                                        t-att-class="state.period === period.value ? 'custom-radio active' : 'custom-radio'"
+                                        t-on-click="OnChangePeriodFromDropdown"
+                                        t-att-data-value="period.value"
+                                    >
+                                        <span>
+                                            <t t-esc="period.label" />
+                                        </span>
+                                    </div>
+                                </li>
+                            </t>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="statistics-wrap card mb-4">
+                <div
+                    class="statistics-box-main row flex-wrap row-cols-2  row-cols-sm-3 row-cols-lg-6 g-3 g-sm-4"
+                >
+                    <div class="col">
+                        <div class="stat-card">
+                            <div class="stat-label-wrap">
+                                <p class="stat-label">Total<br />
+Opportunities</p>
+                            </div>
+                            <div
+                                class="stat-value"
+                                id="total_opportunities_stats"
+                            >0</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="stat-card">
+                            <div class="stat-label-wrap">
+                                <p class="stat-label">Won<br />
+Opportunities</p>
+                            </div>
+                            <div class="stat-value" id="won_opportunities_stats" />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="stat-card">
+                            <div class="stat-label-wrap">
+                                <p class="stat-label">Pipeline<br />
+Value</p>
+                            </div>
+                            <div class="stat-value" id="pipeline_value_stats">₹0</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="stat-card">
+                            <div class="stat-label-wrap">
+                                <p class="stat-label">Total<br />
+Sales</p>
+                            </div>
+                            <div class="stat-value" id="total_sales_stats">₹0</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="stat-card">
+                            <div class="stat-label-wrap">
+                                <p class="stat-label">Average<br />
+Deal Size</p>
+                            </div>
+                            <div
+                                class="stat-value"
+                                id="average_deal_size_stats"
+                            >₹0</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="stat-card border-0">
+                            <div class="stat-label-wrap">
+                                <p class="stat-label">Open<br />
+Quotations</p>
+                            </div>
+                            <div class="stat-value" id="open_quotations_stats">₹0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="row g-4">
+                <!-- Quotation Vs Sales Order Card -->
+                <div class="col-12 col-lg-7">
+                    <div class="card h-100">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="card-title mb-0">Quotation Vs Sales Order
+                                </h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Compares quotation values with confirmed sales orders for the selected period and shows the conversion rate to measure sales performance."
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gx-md-4 gx-2 gy-3 gy-md-0 stat-card-wrap">
+                                <div class="col-auto ps-0">
+                                    <div class="stat-card">
+                                        <div class="stat-label-wrap">
+                                            <p class="stat-label">Total<br />
+Quotations</p>
+                                        </div>
+                                        <div
+                                            class="stat-value"
+                                            id="total_quotations"
+                                        >₹520k</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label-wrap">
+                                            <p class="stat-label">Sales<br />
+Order</p>
+                                        </div>
+                                        <div
+                                            class="stat-value"
+                                            id="total_orders"
+                                        >₹410k</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label-wrap">
+                                            <p class="stat-label">Total<br />
+Conversions</p>
+                                        </div>
+                                        <div
+                                            class="stat-value"
+                                            id="total_conversion"
+                                        >94.2%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="quotation_order_chart" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opportunity Pipeline Card -->
+                <div class="col-12 col-lg-5">
+                    <div class="card h-100 p-0">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                            style="padding:20px 20px 0 20px;"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="card-title mb-0">Opportunity Pipeline
+                                </h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Shows the current value of all opportunities in CRM, distributed by sales stage. This represents the live pipeline as of today, not limited to any specific date range."
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div class="dropdown">
+                                    <button
+                                        class="btn btn-sm btn-design text-black"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 14 14"
+                                            fill="none"
+                                        >
+                                            <path
+                                                d="M6.78097 13.6661C6.57145 13.6661 6.39685 13.5962 6.25717 13.4565C6.11749 13.3169 6.04765 13.1423 6.04765 12.9327V7.62238L0.908711 1.12347C0.780459 0.952042 0.762999 0.777443 0.85633 0.599669C0.949662 0.421895 1.09887 0.333008 1.30394 0.333008H12.6961C12.9012 0.333008 13.0504 0.421895 13.1437 0.599669C13.237 0.778713 13.2196 0.953312 13.0913 1.12347L7.95237 7.62333V12.9346C7.95237 13.1429 7.88253 13.3172 7.74285 13.4575C7.60317 13.5978 7.42857 13.6676 7.21905 13.667L6.78097 13.6661ZM7.00001 7.28524L11.7142 1.28537H2.28582L7.00001 7.28524Z"
+                                                fill="black"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <ul class="dropdown-menu p-2 filter-dropdown">
+                                        <t
+                                            t-foreach="state.funnel_data.all_stages"
+                                            t-as="stage"
+                                            t-key="stage_index"
+                                        >
+                                            <li class="dropdown-item">
+                                                <div class="form-check">
+                                                    <input
+                                                        class="form-check-input"
+                                                        type="checkbox"
+                                                        t-att-value="stage"
+                                                        t-att-id="'stage-' + stage_index"
+                                                        t-att-checked="!state.funnel_data.hidden_stages.includes(stage)"
+                                                        t-on-change="onStageToggle"
+                                                    />
+                                                    <label
+                                                        class="form-check-label"
+                                                        t-att-for="'stage-' + stage_index"
+                                                    >
+                                                        <t t-esc="stage" />
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="card-body"
+                            style="display: flex;justify-content: left;align-items: center;"
+                        >
+                            <div id="opportunity_pipeline" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opportunities by Sources Card -->
+                <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5
+                                    class="card-title mb-0"
+                                >Opportunities by Sources</h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Displays the expected revenue of opportunities created within the selected period, grouped by their source. Helps track which channels are driving the most pipeline during the chosen timeframe."
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div class="dropdown">
+                                    <button
+                                        class="btn btn-sm btn-design text-black"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 14 14"
+                                            fill="none"
+                                        >
+                                            <path
+                                                d="M6.78097 13.6661C6.57145 13.6661 6.39685 13.5962 6.25717 13.4565C6.11749 13.3169 6.04765 13.1423 6.04765 12.9327V7.62238L0.908711 1.12347C0.780459 0.952042 0.762999 0.777443 0.85633 0.599669C0.949662 0.421895 1.09887 0.333008 1.30394 0.333008H12.6961C12.9012 0.333008 13.0504 0.421895 13.1437 0.599669C13.237 0.778713 13.2196 0.953312 13.0913 1.12347L7.95237 7.62333V12.9346C7.95237 13.1429 7.88253 13.3172 7.74285 13.4575C7.60317 13.5978 7.42857 13.6676 7.21905 13.667L6.78097 13.6661ZM7.00001 7.28524L11.7142 1.28537H2.28582L7.00001 7.28524Z"
+                                                fill="black"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <ul
+                                        class="dropdown-menu p-2 filter-dropdown"
+                                        style="max-height: 300px; overflow-y: auto;"
+                                    >
+                                        <t
+                                            t-if="state.opportunities_by_source_data?.all_sources"
+                                        >
+                                            <t
+                                                t-foreach="state.opportunities_by_source_data.all_sources"
+                                                t-as="src"
+                                                t-key="src.id"
+                                            >
+                                                <li class="dropdown-item">
+                                                    <div class="form-check">
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="checkbox"
+                                                            t-att-value="src.id"
+                                                            t-att-id="'source-' + src.id"
+                                                            t-att-checked="!state.hiddenSourceIds.includes(src.id)"
+                                                            t-on-change="onSourceToggle"
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            t-att-for="'source-' + src.id"
+                                                        >
+                                                            <t
+                                                                t-esc="src.name.length > 10 ? src.name.substr(0, 10) + '...' : src.name"
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <li
+                                                class="dropdown-item text-muted"
+                                            >No sources available</li>
+                                        </t>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gx-md-4 gx-2 gy-3 gy-md-0 stat-card-wrap">
+                                <div class="col-auto ps-0">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Total Expected <br />
+ Revenue</div>
+                                        <div
+                                            class="stat-value"
+                                            id="total_expected_revenue_source"
+                                        >₹420k</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Top <br />
+ Source</div>
+                                        <div
+                                            class="stat-value"
+                                            id="top_source"
+                                        >Website</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="opportunities_by_source_chart" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geography-wise Revenue Card -->
+                <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="card-title mb-0">Geography-wise Revenue </h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Shows revenue from won deals grouped by geography for the selected period. Helps identify top-performing regions and the percentage contribution of the leading geographies to overall sales."
+                                >
+                                    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                                        <path d="M8.58342 0.5C10.683 0.5 12.6967 1.33407 14.1813 2.81874C15.666 4.3034 16.5001 6.31704 16.5001 8.41667C16.5001 10.5163 15.666 12.5299 14.1813 14.0146C12.6967 15.4993 10.683 16.3333 8.58342 16.3333C6.48378 16.3333 4.47015 15.4993 2.98549 14.0146C1.50082 12.5299 0.666748 10.5163 0.666748 8.41667C0.666748 6.31704 1.50082 4.3034 2.98549 2.81874C4.47015 1.33407 6.48378 0.5 8.58342 0.5ZM8.58342 1.33333C6.7048 1.33333 4.90312 2.07961 3.57474 3.40799C2.24636 4.73638 1.50008 6.53805 1.50008 8.41667C1.50008 10.2953 2.24636 12.097 3.57474 13.4253C4.90312 14.7537 6.7048 15.5 8.58342 15.5C9.51361 15.5 10.4347 15.3168 11.2941 14.9608C12.1535 14.6048 12.9343 14.0831 13.5921 13.4253C14.2498 12.7676 14.7716 11.9867 15.1276 11.1273C15.4835 10.268 15.6667 9.34686 15.6667 8.41667C15.6667 6.53805 14.9205 4.73638 13.5921 3.40799C12.2637 2.07961 10.462 1.33333 8.58342 1.33333ZM8.16675 4.66667V6.33333H9.00008V4.66667H8.16675ZM8.16675 8V12.1667H9.00008V8H8.16675Z" fill="#8E94A3" />
+                                    </svg> -->
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div class="dropdown">
+                                    <button
+                                        class="btn btn-sm btn-design text-black"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 14 14"
+                                            fill="none"
+                                        >
+                                            <path
+                                                d="M6.78097 13.6661C6.57145 13.6661 6.39685 13.5962 6.25717 13.4565C6.11749 13.3169 6.04765 13.1423 6.04765 12.9327V7.62238L0.908711 1.12347C0.780459 0.952042 0.762999 0.777443 0.85633 0.599669C0.949662 0.421895 1.09887 0.333008 1.30394 0.333008H12.6961C12.9012 0.333008 13.0504 0.421895 13.1437 0.599669C13.237 0.778713 13.2196 0.953312 13.0913 1.12347L7.95237 7.62333V12.9346C7.95237 13.1429 7.88253 13.3172 7.74285 13.4575C7.60317 13.5978 7.42857 13.6676 7.21905 13.667L6.78097 13.6661ZM7.00001 7.28524L11.7142 1.28537H2.28582L7.00001 7.28524Z"
+                                                fill="black"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <ul class="dropdown-menu p-2 filter-dropdown">
+                                        <!-- Country Radio -->
+                                        <li class="dropdown-item">
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input radio"
+                                                    type="radio"
+                                                    name="locationFilter"
+                                                    value="country"
+                                                    id="filter-country"
+                                                    t-att-checked="state.country_chart_filter === 'country'"
+                                                    t-on-change="onCountryChartFilterChange"
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    for="filter-country"
+                                                >
+                                                    Country
+                                                </label>
+                                            </div>
+                                        </li>
+
+                                        <!-- State Radio -->
+                                        <li class="dropdown-item">
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input radio"
+                                                    type="radio"
+                                                    name="locationFilter"
+                                                    value="state"
+                                                    id="filter-state"
+                                                    t-att-checked="state.country_chart_filter === 'state'"
+                                                    t-on-change="onCountryChartFilterChange"
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    for="filter-state"
+                                                >
+                                                    State
+                                                </label>
+                                            </div>
+                                        </li>
+
+                                        <!-- City Radio -->
+                                        <li class="dropdown-item">
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input radio"
+                                                    type="radio"
+                                                    name="locationFilter"
+                                                    value="city"
+                                                    id="filter-city"
+                                                    t-att-checked="state.country_chart_filter === 'city'"
+                                                    t-on-change="onCountryChartFilterChange"
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    for="filter-city"
+                                                >
+                                                    City
+                                                </label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gx-md-4 gx-2 gy-3 gy-md-0 stat-card-wrap">
+                                <div class="col-auto ps-0">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Geographies With <br />
+ Won Deals</div>
+                                        <div
+                                            class="stat-value"
+                                            id="geographies_with_won_deals"
+                                        >6</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Percentage Share Of <br
+                                        />
+ Top 3 Geographies</div>
+                                        <div
+                                            class="stat-value"
+                                            id="percentage_share_top_geographies"
+                                        >0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="country_wise_revenue_chart" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Person Performance Overview Card -->
+                <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5
+                                    class="card-title mb-0"
+                                >Sales Person Performance Overview</h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Shows each salesperson’s expected revenue versus won revenue for the selected period. Helps compare performance, track conversion efficiency, and measure average revenue contribution per salesperson."
+                                >
+                                    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                                        <path d="M8.58342 0.5C10.683 0.5 12.6967 1.33407 14.1813 2.81874C15.666 4.3034 16.5001 6.31704 16.5001 8.41667C16.5001 10.5163 15.666 12.5299 14.1813 14.0146C12.6967 15.4993 10.683 16.3333 8.58342 16.3333C6.48378 16.3333 4.47015 15.4993 2.98549 14.0146C1.50082 12.5299 0.666748 10.5163 0.666748 8.41667C0.666748 6.31704 1.50082 4.3034 2.98549 2.81874C4.47015 1.33407 6.48378 0.5 8.58342 0.5ZM8.58342 1.33333C6.7048 1.33333 4.90312 2.07961 3.57474 3.40799C2.24636 4.73638 1.50008 6.53805 1.50008 8.41667C1.50008 10.2953 2.24636 12.097 3.57474 13.4253C4.90312 14.7537 6.7048 15.5 8.58342 15.5C9.51361 15.5 10.4347 15.3168 11.2941 14.9608C12.1535 14.6048 12.9343 14.0831 13.5921 13.4253C14.2498 12.7676 14.7716 11.9867 15.1276 11.1273C15.4835 10.268 15.6667 9.34686 15.6667 8.41667C15.6667 6.53805 14.9205 4.73638 13.5921 3.40799C12.2637 2.07961 10.462 1.33333 8.58342 1.33333ZM8.16675 4.66667V6.33333H9.00008V4.66667H8.16675ZM8.16675 8V12.1667H9.00008V8H8.16675Z" fill="#8E94A3" />
+                                    </svg> -->
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gx-md-4 gx-2 gy-3 gy-md-0 stat-card-wrap">
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Avg. Opportunity <br />
+ Count</div>
+                                        <div
+                                            class="stat-value"
+                                            id="avg_opportunity_count"
+                                        >420k</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Avg. Revenue<br />
+Per Sales Person</div>
+                                        <div
+                                            class="stat-value"
+                                            id="avg_revenue_per_salesperson"
+                                        >₹23.33k</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="chart-placeholder"
+                                id="salesperson_performance_overview"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opportunities By Tag Card -->
+                <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5
+                                    class="card-title mb-0"
+                                >Opportunities By Tag       </h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Shows the expected and won revenue of opportunities grouped by tags within the selected period. Helps analyze how different categories or priorities contribute to pipeline value and closed deals."
+                                >
+                                    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                                        <path d="M8.58342 0.5C10.683 0.5 12.6967 1.33407 14.1813 2.81874C15.666 4.3034 16.5001 6.31704 16.5001 8.41667C16.5001 10.5163 15.666 12.5299 14.1813 14.0146C12.6967 15.4993 10.683 16.3333 8.58342 16.3333C6.48378 16.3333 4.47015 15.4993 2.98549 14.0146C1.50082 12.5299 0.666748 10.5163 0.666748 8.41667C0.666748 6.31704 1.50082 4.3034 2.98549 2.81874C4.47015 1.33407 6.48378 0.5 8.58342 0.5ZM8.58342 1.33333C6.7048 1.33333 4.90312 2.07961 3.57474 3.40799C2.24636 4.73638 1.50008 6.53805 1.50008 8.41667C1.50008 10.2953 2.24636 12.097 3.57474 13.4253C4.90312 14.7537 6.7048 15.5 8.58342 15.5C9.51361 15.5 10.4347 15.3168 11.2941 14.9608C12.1535 14.6048 12.9343 14.0831 13.5921 13.4253C14.2498 12.7676 14.7716 11.9867 15.1276 11.1273C15.4835 10.268 15.6667 9.34686 15.6667 8.41667C15.6667 6.53805 14.9205 4.73638 13.5921 3.40799C12.2637 2.07961 10.462 1.33333 8.58342 1.33333ZM8.16675 4.66667V6.33333H9.00008V4.66667H8.16675ZM8.16675 8V12.1667H9.00008V8H8.16675Z" fill="#8E94A3" />
+                                    </svg> -->
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <div class="dropdown">
+                                    <button
+                                        class="btn btn-sm btn-design text-black"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 14 14"
+                                            fill="none"
+                                        >
+                                            <path
+                                                d="M6.78097 13.6661C6.57145 13.6661 6.39685 13.5962 6.25717 13.4565C6.11749 13.3169 6.04765 13.1423 6.04765 12.9327V7.62238L0.908711 1.12347C0.780459 0.952042 0.762999 0.777443 0.85633 0.599669C0.949662 0.421895 1.09887 0.333008 1.30394 0.333008H12.6961C12.9012 0.333008 13.0504 0.421895 13.1437 0.599669C13.237 0.778713 13.2196 0.953312 13.0913 1.12347L7.95237 7.62333V12.9346C7.95237 13.1429 7.88253 13.3172 7.74285 13.4575C7.60317 13.5978 7.42857 13.6676 7.21905 13.667L6.78097 13.6661ZM7.00001 7.28524L11.7142 1.28537H2.28582L7.00001 7.28524Z"
+                                                fill="black"
+                                            />
+                                        </svg>
+                                    </button>
+
+                                    <ul
+                                        class="dropdown-menu p-2 filter-dropdown"
+                                        style="max-height: 300px; overflow-y: auto;"
+                                    >
+                                        <t
+                                            t-if="state.opportunities_by_tag_data &amp;&amp; state.opportunities_by_tag_data.all_tags"
+                                        >
+                                            <t
+                                                t-foreach="state.opportunities_by_tag_data.all_tags"
+                                                t-as="tag"
+                                                t-key="tag_index"
+                                            >
+                                                <li class="dropdown-item">
+                                                    <div class="form-check">
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="checkbox"
+                                                            t-att-value="tag.id"
+                                                            t-att-id="'tag-' + tag_index"
+                                                            t-att-checked="!state.opportunities_by_tag_data.hidden_tags.includes(tag.name)"
+                                                            t-on-change="onTagToggle"
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            t-att-for="'tag-' + tag_index"
+                                                        >
+                                                            <t
+                                                                t-esc="tag.name.length > 10 ? tag.name.substr(0, 10) + '...' : tag.name"
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <li
+                                                class="dropdown-item text-muted"
+                                            >No tags available</li>
+                                        </t>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gx-md-4 gx-2 gy-3 gy-md-0 stat-card-wrap">
+                                <div class="col-auto ps-0">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Expected <br />
+ Revenue By Tags</div>
+                                        <div
+                                            class="stat-value"
+                                            id="expected_revenue_by_tags"
+                                        >0</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Won Revenue <br />
+ by Tags</div>
+                                        <div
+                                            class="stat-value"
+                                            id="won_revenue_by_tags"
+                                        >0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="chart-placeholder"
+                                id="opportunities_by_tag_chart"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 7 Customers Card -->
+                <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="card-title mb-0">Top 7 Customers   </h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Highlights the top 7 customers based on won revenue during the selected period. Shows their contribution, average deal size, and share of total revenue to identify key accounts driving business growth."
+                                >
+                                    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                                        <path d="M8.58342 0.5C10.683 0.5 12.6967 1.33407 14.1813 2.81874C15.666 4.3034 16.5001 6.31704 16.5001 8.41667C16.5001 10.5163 15.666 12.5299 14.1813 14.0146C12.6967 15.4993 10.683 16.3333 8.58342 16.3333C6.48378 16.3333 4.47015 15.4993 2.98549 14.0146C1.50082 12.5299 0.666748 10.5163 0.666748 8.41667C0.666748 6.31704 1.50082 4.3034 2.98549 2.81874C4.47015 1.33407 6.48378 0.5 8.58342 0.5ZM8.58342 1.33333C6.7048 1.33333 4.90312 2.07961 3.57474 3.40799C2.24636 4.73638 1.50008 6.53805 1.50008 8.41667C1.50008 10.2953 2.24636 12.097 3.57474 13.4253C4.90312 14.7537 6.7048 15.5 8.58342 15.5C9.51361 15.5 10.4347 15.3168 11.2941 14.9608C12.1535 14.6048 12.9343 14.0831 13.5921 13.4253C14.2498 12.7676 14.7716 11.9867 15.1276 11.1273C15.4835 10.268 15.6667 9.34686 15.6667 8.41667C15.6667 6.53805 14.9205 4.73638 13.5921 3.40799C12.2637 2.07961 10.462 1.33333 8.58342 1.33333ZM8.16675 4.66667V6.33333H9.00008V4.66667H8.16675ZM8.16675 8V12.1667H9.00008V8H8.16675Z" fill="#8E94A3" />
+                                    </svg> -->
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gx-md-4 gx-2 gy-3 gy-md-0 stat-card-wrap">
+                                <div class="col-auto ps-0">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Total Won <br />
+ Revenue (Top 7)</div>
+                                        <div
+                                            class="stat-value"
+                                            id="total_won_revenue_top_customers"
+                                        >₹154k</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Average <br />
+ Deal Size</div>
+                                        <div
+                                            class="stat-value"
+                                            id="average_deal_size_top_customers"
+                                        >0</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div
+                                            class="stat-label"
+                                        >Percentage Share Of Top 7 Vs <br />
+ All Won Revenue</div>
+                                        <div
+                                            class="stat-value"
+                                            id="percentage_share_top_customers"
+                                        >0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-placeholder" id="top_seven_customers" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lost Opportunities By Reason Card -->
+                <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center"
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <h5
+                                    class="card-title mb-0"
+                                >Lost Opportunities By Reason    </h5>
+                                <a
+                                    href="#"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    data-bs-custom-class="custom-tooltip"
+                                    title="Displays the number and value of lost opportunities during the selected period, grouped by reasons. Helps identify the main causes of lost deals and areas where sales performance can be improved."
+                                >
+                                    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                                        <path d="M8.58342 0.5C10.683 0.5 12.6967 1.33407 14.1813 2.81874C15.666 4.3034 16.5001 6.31704 16.5001 8.41667C16.5001 10.5163 15.666 12.5299 14.1813 14.0146C12.6967 15.4993 10.683 16.3333 8.58342 16.3333C6.48378 16.3333 4.47015 15.4993 2.98549 14.0146C1.50082 12.5299 0.666748 10.5163 0.666748 8.41667C0.666748 6.31704 1.50082 4.3034 2.98549 2.81874C4.47015 1.33407 6.48378 0.5 8.58342 0.5ZM8.58342 1.33333C6.7048 1.33333 4.90312 2.07961 3.57474 3.40799C2.24636 4.73638 1.50008 6.53805 1.50008 8.41667C1.50008 10.2953 2.24636 12.097 3.57474 13.4253C4.90312 14.7537 6.7048 15.5 8.58342 15.5C9.51361 15.5 10.4347 15.3168 11.2941 14.9608C12.1535 14.6048 12.9343 14.0831 13.5921 13.4253C14.2498 12.7676 14.7716 11.9867 15.1276 11.1273C15.4835 10.268 15.6667 9.34686 15.6667 8.41667C15.6667 6.53805 14.9205 4.73638 13.5921 3.40799C12.2637 2.07961 10.462 1.33333 8.58342 1.33333ZM8.16675 4.66667V6.33333H9.00008V4.66667H8.16675ZM8.16675 8V12.1667H9.00008V8H8.16675Z" fill="#8E94A3" />
+                                    </svg> -->
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                    >
+                                        <path
+                                            d="M12 16.5C12.1427 16.5 12.2617 16.452 12.357 16.356C12.4523 16.26 12.5 16.1413 12.5 16V11.5C12.5 11.358 12.452 11.2393 12.356 11.144C12.26 11.0487 12.141 11.0007 11.999 11C11.857 10.9993 11.7383 11.0473 11.643 11.144C11.5477 11.2407 11.5 11.3593 11.5 11.5V16C11.5 16.142 11.548 16.2607 11.644 16.356C11.74 16.4513 11.859 16.4993 12.001 16.5M12 9.577C12.1747 9.577 12.321 9.518 12.439 9.4C12.557 9.282 12.6157 9.136 12.615 8.962C12.6143 8.788 12.5553 8.64167 12.438 8.523C12.3207 8.40433 12.1747 8.34533 12 8.346C11.8253 8.34667 11.6793 8.40567 11.562 8.523C11.4447 8.64033 11.3857 8.78667 11.385 8.962C11.3843 9.13733 11.4433 9.28333 11.562 9.4C11.6807 9.51667 11.8267 9.57567 12 9.577ZM12.003 21C10.7583 21 9.58833 20.764 8.493 20.292C7.39767 19.8193 6.44467 19.178 5.634 18.368C4.82333 17.558 4.18167 16.606 3.709 15.512C3.23633 14.418 3 13.2483 3 12.003C3 10.7577 3.23633 9.58767 3.709 8.493C4.181 7.39767 4.82133 6.44467 5.63 5.634C6.43867 4.82333 7.391 4.18167 8.487 3.709C9.583 3.23633 10.753 3 11.997 3C13.241 3 14.411 3.23633 15.507 3.709C16.6023 4.181 17.5553 4.82167 18.366 5.631C19.1767 6.44033 19.8183 7.39267 20.291 8.488C20.7637 9.58333 21 10.753 21 11.997C21 13.241 20.764 14.411 20.292 15.507C19.82 16.603 19.1787 17.556 18.368 18.366C17.5573 19.176 16.6053 19.8177 15.512 20.291C14.4187 20.7643 13.249 21.0007 12.003 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                                            fill="black"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row gx-md-4 gx-2 gy-3 gy-md-0 stat-card-wrap">
+                                <div class="col-auto ps-0">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Total Lost<br />
+Opportunities</div>
+                                        <div
+                                            class="stat-value"
+                                            id="total_lost_opportunities"
+                                        >230</div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="stat-card">
+                                        <div class="stat-label">Total<br />
+Lost Revenue</div>
+                                        <div
+                                            class="stat-value"
+                                            id="total_lost_revenue"
+                                        >₹512k</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-placeholder" id="crm_lost_reason_chart" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<thrive>
+    <!-- Client action record for Dashboard -->
+    <record id="crm_action_graph_dashboard" model="ir.actions.client">
+        <field name="name">CRM Graph Dashboard</field>
+        <field name="tag">crm_graph_dashboard</field>
+    </record>
+    <!--  Menu record for dashboard  -->
+    <menuitem
+        id="crm_graph_dashboard_menu_root"
+        name="Dashboard"
+        action="crm_action_graph_dashboard"
+        sequence="0"
+    />
+</thrive>
