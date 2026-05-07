@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <data noupdate="0">
+
+        <record id="lead_expected_closing_email_template" model="mail.template">
+            <field name="name">Lead Expected Closing Email Template</field>
+            <field name="model_id" ref="crm_expected_closing_followup.model_crm_lead"/>
+            <field name="subject">Lead Expected Closing</field>
+            <field name="email_to">{{ ctx.get('email_to') }}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="auto_delete" eval="False"/>
+
+            <field name="body_html" type="html">
+                <div style="margin:0; padding:0; font-size:13px;">
+                    
+                    <p>
+                        Hi Team,<br/><br/>
+                        Expected closing delayed in Lead/Opportunities.<br/><br/>
+                    </p>
+
+                    <table width="100%" style="color:#454748; font-size:12px; border-collapse:collapse; border:1px solid #875A7B;">
+                        
+                        <!-- Header -->
+                        <thead>
+                            <tr style="background-color:#f2f2f2;">
+                                <th style="border:1px solid #875A7B;">Customer Name</th>
+                                <th style="border:1px solid #875A7B;">Sales Person</th>
+                                <th style="border:1px solid #875A7B;">Enquiry</th>
+                                <th style="border:1px solid #875A7B;">Mobile Number</th>
+                                <th style="border:1px solid #875A7B;">Email</th>
+                                <th style="border:1px solid #875A7B;">Status</th>
+                                <th style="border:1px solid #875A7B;">Expected Closing</th>
+                            </tr>
+                        </thead>
+
+                        <!-- Body -->
+                        <tbody>
+                            <t t-foreach="ctx.get('crm_data', [])" t-as="line">
+                                <tr>
+                                    <td style="border:1px solid #875A7B;">
+                                        <t t-out="line.get('customer_name', '')"/>
+                                    </td>
+                                    <td style="border:1px solid #875A7B;">
+                                        <t t-out="line.get('sales_person', '')"/>
+                                    </td>
+                                    <td style="border:1px solid #875A7B;">
+                                        <t t-out="line.get('enquiry', '')"/>
+                                    </td>
+                                    <td style="border:1px solid #875A7B;">
+                                        <t t-out="line.get('mobile_number', '')"/>
+                                    </td>
+                                    <td style="border:1px solid #875A7B;">
+                                        <t t-out="line.get('email', '')"/>
+                                    </td>
+                                    <td style="border:1px solid #875A7B;">
+                                        <t t-out="line.get('status', '')"/>
+                                    </td>
+                                    <td style="border:1px solid #875A7B; text-align:center;">
+                                        <t t-out="line.get('expected_closing', '')"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </field>
+        </record>
+
+    </data>
+</thrive>

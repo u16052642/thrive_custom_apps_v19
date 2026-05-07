@@ -1,0 +1,32 @@
+.o-oo-format-card {
+    width: 90px;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    user-select: none;
+}
+
+.o-oo-format-card:hover {
+    background-color: rgba($o-brand-primary, 0.05);
+    transform: translateY(-2px);
+}
+
+.o-oo-format-card:focus-visible {
+    outline: 2px solid $o-brand-primary;
+    outline-offset: 2px;
+}
+
+.o-oo-format-selected {
+    background-color: rgba($o-brand-primary, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.o-oo-format-icon {
+    font-size: 48px;
+    color: $o-brand-primary;
+}
+
+.o-oo-chatter-create-dialog {
+    .modal-body {
+        padding: 1.5rem;
+    }
+}

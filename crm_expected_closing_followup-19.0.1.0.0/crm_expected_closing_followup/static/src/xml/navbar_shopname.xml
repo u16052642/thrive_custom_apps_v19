@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pos_session_name.navbar_shopname"
+       t-inherit="point_of_sale.CashierName"
+       t-inherit-mode="extension">
+        <xpath expr="//button[contains(@class, 'cashier-name')]" position="before">
+            <span t-if="shopname" t-esc="shopname" class="shop-name"/>
+        </xpath>
+    </t>
+</templates>

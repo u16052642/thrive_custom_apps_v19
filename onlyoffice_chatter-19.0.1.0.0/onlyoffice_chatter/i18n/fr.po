@@ -1,0 +1,297 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* onlyoffice_chatter
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-11 00:00+0000\n"
+"PO-Revision-Date: 2026-04-11 00:00+0000\n"
+"Last-Translator: Victor Bastías Escobar <contacto@vicbas.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Document"
+msgstr "Document"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Spreadsheet"
+msgstr "Feuille de calcul"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Presentation"
+msgstr "Présentation"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Create with ONLYOFFICE"
+msgstr "Créer avec ONLYOFFICE"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Title"
+msgstr "Titre"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "New Document"
+msgstr "Nouveau document"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Creating..."
+msgstr "Création en cours..."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Create"
+msgstr "Créer"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Document created successfully"
+msgstr "Document créé avec succès"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Error creating document"
+msgstr "Erreur lors de la création du document"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "Create OnlyOffice Document"
+msgstr "Créer un document OnlyOffice"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/src/js/chatter_patch.js
+#, python-format
+msgid "New"
+msgstr "Nouveau"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/controllers/main.py
+#, python-format
+msgid "Unsupported format '%(fmt)s'. Allowed: %(allowed)s"
+msgstr "Format '%(fmt)s' non pris en charge. Autorisés : %(allowed)s"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/controllers/main.py
+#, python-format
+msgid "Model '%(model)s' is not found or does not support Chatter."
+msgstr "Le modèle '%(model)s' est introuvable ou ne prend pas en charge le Chatter."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/controllers/main.py
+#, python-format
+msgid "Title cannot be empty."
+msgstr "Le titre ne peut pas être vide."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/controllers/main.py
+#, python-format
+msgid "Title must not exceed 100 characters."
+msgstr "Le titre ne doit pas dépasser 100 caractères."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/controllers/main.py
+#, python-format
+msgid "Could not load template for format '%(fmt)s'."
+msgstr "Impossible de charger le modèle pour le format '%(fmt)s'."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/controllers/main.py
+#, python-format
+msgid "Unexpected error creating document. Please try again."
+msgstr "Erreur inattendue lors de la création du document. Veuillez réessayer."
+
+#. module: onlyoffice_chatter
+#: model:ir.module.module,name:onlyoffice_chatter.module_meta_config
+msgid "ONLYOFFICE Chatter Integration"
+msgstr "Intégration ONLYOFFICE avec le Chatter"
+
+#. module: onlyoffice_chatter
+#: model:ir.module.module,summary:onlyoffice_chatter.module_meta_config
+msgid "Create OnlyOffice documents directly from the Chatter of any record."
+msgstr "Créez des documents OnlyOffice directement depuis le Chatter de n'importe quel enregistrement."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Create OnlyOffice documents directly from the Chatter of any Odoo record."
+msgstr "Créez des documents OnlyOffice directement depuis le Chatter de n'importe quel enregistrement Odoo."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Key Features"
+msgstr "Fonctionnalités clés"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Create Documents"
+msgstr "Créer des documents"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Create DOCX, XLSX, and PPTX files from any Chatter."
+msgstr "Créez des fichiers DOCX, XLSX et PPTX depuis n'importe quel Chatter."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Native Attachments"
+msgstr "Pièces jointes natives"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Files are stored as standard ir.attachment — no extra apps needed."
+msgstr "Les fichiers sont stockés comme ir.attachment standard — aucune application supplémentaire nécessaire."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Community Edition"
+msgstr "Édition Community"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Works with Odoo Community. Does not require Enterprise Documents."
+msgstr "Fonctionne avec Odoo Community. Ne nécessite pas Enterprise Documents."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "How It Works"
+msgstr "Comment ça marche"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Step 1."
+msgstr "Étape 1."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Click the \"New\" button on any Chatter."
+msgstr "Cliquez sur le bouton \"Nouveau\" sur n'importe quel Chatter."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Step 2."
+msgstr "Étape 2."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Choose a format and enter a title."
+msgstr "Choisissez un format et entrez un titre."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Supported Formats"
+msgstr "Formats pris en charge"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Word Document"
+msgstr "Document Word"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Excel Spreadsheet"
+msgstr "Feuille de calcul Excel"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "PowerPoint Presentation"
+msgstr "Présentation PowerPoint"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Requirements"
+msgstr "Prérequis"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "onlyoffice_odoo module installed and configured"
+msgstr "Module onlyoffice_odoo installé et configuré"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "ONLYOFFICE Document Server running and accessible"
+msgstr "Serveur de documents ONLYOFFICE en cours d'exécution et accessible"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Odoo 19.0 Community or Enterprise"
+msgstr "Odoo 19.0 Community ou Enterprise"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Multilingual"
+msgstr "Multilingue"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Available in English, Spanish, French, Russian, Chinese, and Dutch (Belgium)."
+msgstr "Disponible en anglais, espagnol, français, russe, chinois et néerlandais (Belgique)."
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Licensed under LGPL-3 · Free and Open Source"
+msgstr "Sous licence LGPL-3 · Gratuit et Open Source"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Depends on onlyoffice_odoo (MIT License by José Padilla)"
+msgstr "Dépend de onlyoffice_odoo (Licence MIT par José Padilla)"
+
+#. module: onlyoffice_chatter
+#: code:addons/onlyoffice_chatter/static/description/index.html:0
+#, python-format
+msgid "Support:"
+msgstr "Support :"

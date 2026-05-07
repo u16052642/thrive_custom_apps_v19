@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <data noupdate="0">
+        
+        <!-- Dynamic Forms Privilege -->
+        <record model="res.groups.privilege" id="res_groups_privilege_dynamic_forms">
+            <field name="name">Dynamic Forms</field>
+            <field name="sequence">50</field>
+            <field name="category_id" ref="base.module_category_website"/>
+        </record>
+
+        <!-- Dynamic Forms User Group -->
+        <record id="group_dynamic_forms_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="comment">User can create and manage dynamic forms</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_dynamic_forms"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Dynamic Forms Manager Group -->
+        <record id="group_dynamic_forms_manager" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="comment">Administrator can manage all dynamic forms and configurations</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_dynamic_forms"/>
+            <field name="implied_ids" eval="[(4, ref('group_dynamic_forms_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Dynamic Forms Administrator Group (alias for manager, kept for backward compatibility) -->
+        <!-- Note: This is a feature group (no privilege_id) to avoid unique constraint violation with group_dynamic_forms_manager -->
+        <record id="group_dynamic_forms_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="comment">Full administrator access to dynamic forms (legacy group, use group_dynamic_forms_manager)</field>
+            <field name="implied_ids" eval="[(4, ref('group_dynamic_forms_manager'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+        
+        <!-- Access Rights for Dynamic Forms Configuration -->
+        <record id="dynamic_forms_config_rule_admin" model="ir.rule">
+            <field name="name">Dynamic Forms Config: Admin Only</field>
+            <field name="model_id" ref="model_dynamic_forms_config"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_dynamic_forms_admin'))]"/>
+        </record>
+
+        <record id="dynamic_forms_config_rule_manager" model="ir.rule">
+            <field name="name">Dynamic Forms Config: Manager Read</field>
+            <field name="model_id" ref="model_dynamic_forms_config"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_dynamic_forms_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        
+    </data>
+</thrive>

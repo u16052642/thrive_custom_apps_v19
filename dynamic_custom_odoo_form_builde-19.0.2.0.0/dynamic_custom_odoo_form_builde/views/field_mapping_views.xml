@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <data>
+        
+        <!-- Field Mapping Tree View -->
+        <record id="view_dynamic_form_field_mapping_tree" model="ir.ui.view">
+            <field name="name">dynamic.form.field.mapping.tree</field>
+            <field name="model">dynamic.form.field.mapping</field>
+            <field name="arch" type="xml">
+                <list string="Field Mappings">
+                    <field name="sequence" widget="handle"/>
+                    <field name="form_field_id"/>
+                    <field name="model_field"/>
+                    <field name="model_field_label"/>
+                    <field name="label_field"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+        
+        <!-- Field Mapping Form View -->
+        <record id="view_dynamic_form_field_mapping_form" model="ir.ui.view">
+            <field name="name">dynamic.form.field.mapping.form</field>
+            <field name="model">dynamic.form.field.mapping</field>
+            <field name="arch" type="xml">
+                <form string="Field Mapping">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="form_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                                <field name="form_field_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                                <field name="model_field"/>
+                                <field name="model_field_label" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="label_field"/>
+                                <field name="sequence"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-info" role="alert">
+                            <strong>Label Field:</strong> Only one field can be used as the label field per form. 
+                            This field's value will be used as the name/label for the created record in the target model.
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Field Mapping Search View -->
+        <record id="view_dynamic_form_field_mapping_search" model="ir.ui.view">
+            <field name="name">dynamic.form.field.mapping.search</field>
+            <field name="model">dynamic.form.field.mapping</field>
+            <field name="arch" type="xml">
+                <search string="Field Mappings">
+                    <field name="form_field_id"/>
+                    <field name="model_field"/>
+                    <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+        
+        <!-- Model Fields Wizard Form View -->
+        <record id="view_model_fields_wizard_form" model="ir.ui.view">
+            <field name="name">dynamic.form.model.fields.wizard.form</field>
+            <field name="model">dynamic.form.model.fields.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Available Model Fields">
+                    <header>
+                        <button name="action_close" string="Close" type="object" class="btn-primary"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="model_id" readonly="1"/>
+                            <field name="model_name" readonly="1"/>
+                        </group>
+                        <div class="alert alert-info" role="alert">
+                            <strong>Available Fields:</strong> Below are all the available fields in the target model. 
+                            Use the field name (first column) when mapping form fields.
+                        </div>
+                        <field name="field_ids">
+                            <list string="Fields" readonly="1">
+                                <field name="field_name" string="Field Name" default_focus="1"/>
+                                <field name="field_label" string="Field Label"/>
+                                <field name="field_type" string="Type"/>
+                                <field name="required" string="Required" widget="boolean_toggle"/>
+                                <field name="readonly" string="Readonly" widget="boolean_toggle"/>
+                            </list>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</thrive>
