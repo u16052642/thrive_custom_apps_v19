@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <!-- Define Module Category -->
+    <record id="module_category_solar_management" model="ir.module.category">
+        <field name="name">Solar Energy Management</field>
+        <field name="description">Access rights for Solar Energy Management.</field>
+        <field name="sequence">15</field>
+    </record>
+
+    <!-- Define Privilege model for Odoo 19 -->
+    <record id="privilege_solar_management" model="res.groups.privilege">
+        <field name="name">Solar Energy Management</field>
+        <field name="category_id" ref="module_category_solar_management"/>
+    </record>
+
+    <!-- Group: Sales -->
+    <record id="group_solar_sales" model="res.groups">
+        <field name="name">Sales</field>
+        <field name="privilege_id" ref="privilege_solar_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Access to solar dashboard, leads, sales, quotations, site inspections, and approvals.</field>
+    </record>
+
+    <!-- Group: Technician & Engineer -->
+    <record id="group_solar_technician" model="res.groups">
+        <field name="name">Technician &amp; Engineer</field>
+        <field name="privilege_id" ref="privilege_solar_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('project.group_project_user'))]"/>
+        <field name="comment">Access to perform inspections, create designs, and update installation progress.</field>
+    </record>
+
+    <!-- Group: Project Manager / Lead Technician -->
+    <record id="group_solar_project_manager" model="res.groups">
+        <field name="name">Project Manager</field>
+        <field name="privilege_id" ref="privilege_solar_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_solar_technician')), (4, ref('project.group_project_manager'))]"/>
+        <field name="comment">Access to assign projects/tasks, approve designs/inspections, and manage team resources.</field>
+    </record>
+
+    <!-- Group: Finance -->
+    <record id="group_solar_finance" model="res.groups">
+        <field name="name">Finance</field>
+        <field name="privilege_id" ref="privilege_solar_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_invoice'))]"/>
+        <field name="comment">Access to money, accounting, invoice management, vendor bills, payments, and financial reports.</field>
+    </record>
+
+    <!-- Group: Office / Facility Manager -->
+    <record id="group_solar_office_manager" model="res.groups">
+        <field name="name">Office/Facility Manager</field>
+        <field name="privilege_id" ref="privilege_solar_management"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('stock.group_stock_user')), (4, ref('purchase.group_purchase_user'))]"/>
+        <field name="comment">Access to assets, inventory, procurement approvals, stock count, and warehouse operations.</field>
+    </record>
+
+    <!-- Group: Administrator -->
+    <record id="group_solar_manager" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="privilege_id" ref="privilege_solar_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_solar_sales')), (4, ref('group_solar_project_manager')), (4, ref('group_solar_finance')), (4, ref('group_solar_office_manager'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="comment">Full access to solar management including teams, configuration, and settings.</field>
+    </record>
+
+    <!-- Inherit Odoo System Administrator to automatically include Solar Energy Management Administrator -->
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_solar_manager'))]"/>
+    </record>
+</thrive>

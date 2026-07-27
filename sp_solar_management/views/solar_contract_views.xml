@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="seq_solar_contract" model="ir.sequence">
+        <field name="name">Solar Contract</field>
+        <field name="code">solar.contract</field>
+        <field name="prefix">CON/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_solar_contract_search" model="ir.ui.view">
+        <field name="name">solar.contract.search</field>
+        <field name="model">solar.contract</field>
+        <field name="arch" type="xml">
+            <search string="Contracts">
+                <field name="contract_id"/>
+                <field name="lead_id"/>
+                <field name="partner_id"/>
+                <field name="project_id"/>
+                <field name="installation_id"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft" domain="[('status', '=', 'draft')]"/>
+                <filter name="filter_active" string="Active" domain="[('status', '=', 'active')]"/>
+                <filter name="filter_expired" string="Expired" domain="[('status', '=', 'expired')]"/>
+                <group>
+                    <filter name="group_status" string="Status" domain="[]" context="{'group_by': 'status'}"/>
+                    <filter name="group_partner" string="Customer" domain="[]" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_solar_contract_list" model="ir.ui.view">
+        <field name="name">solar.contract.list</field>
+        <field name="model">solar.contract</field>
+        <field name="arch" type="xml">
+            <list string="Contracts">
+                <field name="contract_id"/>
+                <field name="partner_id"/>
+                <field name="lead_id" optional="hide"/>
+                <field name="project_id" optional="show"/>
+                <field name="installation_id" optional="show"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="contract_amount" widget="monetary"/>
+                 <field name="status" widget="badge"
+                        decoration-info="status == 'draft'"
+                        decoration-success="status == 'active'"
+                        decoration-warning="status == 'expired'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_contract_form" model="ir.ui.view">
+        <field name="name">solar.contract.form</field>
+        <field name="model">solar.contract</field>
+        <field name="arch" type="xml">
+            <form string="Solar Contract">
+                <header>
+                    <field name="user_is_pm" invisible="1"/>
+                    <field name="user_is_sales" invisible="1"/>
+                    <field name="user_is_tech" invisible="1"/>
+                    <button name="action_activate" string="Activate" type="object" class="btn-primary" invisible="not (user_is_pm or user_is_sales) or status != 'draft'"/>
+                    <button name="action_expire" string="Expire" type="object" class="btn-secondary" invisible="not (user_is_pm or user_is_sales) or status != 'active'"/>
+                    <button name="action_renew" string="Renew" type="object" class="btn-primary" invisible="not (user_is_pm or user_is_sales) or status != 'expired'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active,expired" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_project"
+                                icon="fa-tasks"
+                                invisible="not user_is_pm or not project_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Project</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_installation"
+                                icon="fa-wrench"
+                                invisible="not (user_is_tech or user_is_pm) or not installation_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Installation</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="contract_id" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group string="CONTRACT INFORMATION">
+                        <group>
+                            <field name="partner_id" readonly="status != 'draft'"/>
+                            <field name="contract_type_id" options="{'no_create_edit': True}" readonly="status != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="project_id" readonly="status != 'draft'"/>
+                            <field name="installation_id" readonly="status != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="DATES &amp; AMOUNT">
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date" decoration-danger="days_left &lt; 0"/>
+                            <field name="days_left" readonly="1" decoration-danger="days_left &lt; 0"/>
+                        </group>
+                        <group>
+                            <field name="contract_amount"/>
+                            <field name="cost_frequency"/>
+                            <field name="auto_renew"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Included Services" name="included_services">
+                            <style>
+                                .o_solar_services_checklist,
+                                .o_solar_services_checklist &gt; div {
+                                    display: grid !important;
+                                    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                                    column-gap: 32px !important;
+                                    row-gap: 12px !important;
+                                    width: 100% !important;
+                                }
+                                @media (max-width: 767.98px) {
+                                    .o_solar_services_checklist,
+                                    .o_solar_services_checklist &gt; div {
+                                        grid-template-columns: minmax(0, 1fr) !important;
+                                    }
+                                }
+                            </style>
+                            <field name="service_ids" widget="many2many_checkboxes" class="o_solar_services_checklist"/>
+                        </page>
+                        <page string="Documents" name="contract_documents">
+                            <field name="attachment_ids" widget="many2many_binary" string="Documents" nolabel="1"/>
+                        </page>
+                        <page string="Terms &amp; Conditions" name="terms_and_conditions">
+                            <field name="terms_and_conditions" placeholder="Add terms and conditions here..."/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Add contract details and terms here..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_contract" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">solar.contract</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_solar_contract_search"/>
+    </record>
+
+    <menuitem id="menu_solar_contract"
+              name="Contracts"
+              parent="menu_solar_energy_root"
+              action="action_solar_contract"
+              groups="sp_solar_management.group_solar_project_manager,sp_solar_management.group_solar_manager,sp_solar_management.group_solar_sales,sp_solar_management.group_solar_finance"
+              sequence="8"/>
+
+    <!-- Contract Type Views -->
+    <record id="view_solar_contract_type_tree" model="ir.ui.view">
+        <field name="name">solar.contract.type.list</field>
+        <field name="model">solar.contract.type</field>
+        <field name="arch" type="xml">
+            <list string="Contract Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Contract Type Action -->
+    <record id="action_solar_contract_type" model="ir.actions.act_window">
+        <field name="name">Contract Types</field>
+        <field name="res_model">solar.contract.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- Contract Type Menu Item -->
+    <menuitem id="menu_solar_contract_type"
+              name="Contract Types"
+              parent="menu_solar_energy_configuration"
+              action="action_solar_contract_type"
+              groups="sp_solar_management.group_solar_manager"
+              sequence="25"/>
+
+    <!-- Contract Service Views -->
+    <record id="view_solar_contract_service_tree" model="ir.ui.view">
+        <field name="name">solar.contract.service.list</field>
+        <field name="model">solar.contract.service</field>
+        <field name="arch" type="xml">
+            <list string="Contract Services" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Contract Service Action -->
+    <record id="action_solar_contract_service" model="ir.actions.act_window">
+        <field name="name">Contract Services</field>
+        <field name="res_model">solar.contract.service</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- Contract Service Menu Item -->
+    <menuitem id="menu_solar_contract_service"
+              name="Contract Services"
+              parent="menu_solar_energy_configuration"
+              action="action_solar_contract_service"
+              groups="sp_solar_management.group_solar_manager"
+              sequence="26"/>
+</thrive>

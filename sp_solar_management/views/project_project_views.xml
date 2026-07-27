@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <data>
+        <!-- Project Sequence -->
+        <record id="seq_project_project_solar" model="ir.sequence">
+            <field name="name">Solar Project ID</field>
+            <field name="code">project.project.solar</field>
+            <field name="prefix">PRJ-%(year)s-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Inherit Form View -->
+        <record id="view_project_project_form_inherit_solar" model="ir.ui.view">
+            <field name="name">project.project.form.inherit.solar</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+
+                <!-- Smart buttons inside button_box -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <field name="lead_id" invisible="1"/>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_lead"
+                            icon="fa-handshake-o"
+                            invisible="not lead_id">
+                        <field name="lead_count" widget="statinfo" string="Lead"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_site_inspections"
+                            icon="fa-building-o"
+                            invisible="inspection_count == 0">
+                        <field name="inspection_count" widget="statinfo" string="Inspections"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_designs"
+                            icon="fa-pencil-square-o"
+                            invisible="design_count == 0">
+                        <field name="design_count" widget="statinfo" string="Design"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_government_approval"
+                            icon="fa-university"
+                            invisible="government_approval_count == 0">
+                        <field name="government_approval_count" widget="statinfo" string="SSEG Application"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_installations"
+                            icon="fa-wrench"
+                            invisible="installation_count == 0">
+                        <field name="installation_count" widget="statinfo" string="Installations"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_contracts"
+                            icon="fa-pencil-square-o"
+                            invisible="contract_count == 0">
+                        <field name="contract_count" widget="statinfo" string="Contracts"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_documents"
+                            icon="fa-file-text-o">
+                        <field name="document_count" widget="statinfo" string="Documents"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            name="action_view_maintenance"
+                            icon="fa-wrench">
+                        <field name="maintenance_count" widget="statinfo" string="Maintenance"/>
+                    </button>
+                </xpath>
+
+
+                <!-- Replace Project title header to show Project ID in large and name below it -->
+                <xpath expr="//div[hasclass('oe_title')]" position="replace">
+                    <div class="oe_title">
+                        <h1 class="d-flex flex-row align-items-center mb-1" invisible="not id">
+                            <field name="is_favorite" nolabel="1" widget="project_is_favorite" class="me-2" options="{'autosave': False}"/>
+                            <field name="project_reference" class="o_text_overflow" readonly="1"/>
+                        </h1>
+                        <h1 class="d-flex flex-row align-items-center mb-1" invisible="id">
+                            <field name="is_favorite" nolabel="1" widget="project_is_favorite" class="me-2" options="{'autosave': False}"/>
+                            <field name="name" options="{'line_breaks': False}" widget="text" class="o_text_overflow" placeholder="e.g. Office Party"/>
+                        </h1>
+                        <div class="text-break text-muted fs-4" invisible="not id">
+                            <field name="name" class="oe_inline" placeholder="e.g. Office Party" required="1"/>
+                        </div>
+                    </div>
+                </xpath>
+
+                <!-- Add solar_stage to sheet group -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="solar_stage" string="Project Progress" widget="badge"
+                           decoration-danger="solar_stage == 'document_pending'"
+                           decoration-warning="solar_stage == 'site_survey_scheduled'"
+                           decoration-info="solar_stage in ('application_submitted', 'design_approved', 'government_approval')"
+                           decoration-primary="solar_stage in ('installation_in_progress', 'inspection_testing')"
+                           decoration-success="solar_stage == 'system_activated'"/>
+                    <field name="sseg_application_number" string="SSEG Application Number" readonly="1" invisible="not sseg_application_number"/>
+                </xpath>
+
+                <xpath expr="//page[@name='description']" position="before">
+                    <page string="Solar Requirements" name="solar_requirements" invisible="not lead_id">
+                        <group col="2">
+                            <group>
+                                <field name="renewable_service_type"/>
+                                <field name="renewable_solar_company_id"/>
+                            </group>
+                            <group>
+                                <field name="renewable_contract_demand_kw"/>
+                            </group>
+                        </group>
+
+                        <separator string="Electricity Details"/>
+
+                        <group col="2">
+                            <group>
+                                <field name="renewable_connection_type" widget="radio"/>
+                                <field name="renewable_existing_connection"/>
+                                <field name="renewable_existing_supply_volts"/>
+                            </group>
+                            <group>
+                                <field name="renewable_consumer_no"/>
+                                <field name="renewable_monthly_electric_bill"/>
+                                <field name="renewable_monthly_electricity_consumption"/>
+                            </group>
+                        </group>
+
+                        <separator string="Site Information"/>
+
+                        <group col="2">
+                            <group>
+                                <field name="renewable_site_usage"/>
+                                <field name="renewable_property_type"/>
+                                <field name="renewable_property_age_years"/>
+                            </group>
+
+                            <group>
+                                <label for="renewable_site_street" string="Address"/>
+                                <div class="o_address_format">
+                                    <field name="renewable_site_street" class="o_address_street" placeholder="Street..."/>
+                                    <field name="renewable_site_street2" class="o_address_street" placeholder="Street 2..."/>
+                                    <field name="renewable_site_city" class="o_address_city" placeholder="City"/>
+                                    <field name="renewable_site_zip" class="o_address_zip" placeholder="ZIP"/>
+                                    <field name="renewable_site_state_id" class="o_address_state" placeholder="State"/>
+                                    <field name="renewable_site_country_id" class="o_address_country" placeholder="Country"/>
+                                </div>
+                            </group>
+                        </group>
+
+                        <separator string="Site Location"/>
+
+                        <group col="2">
+                            <group>
+                                <field name="renewable_site_latitude"/>
+                            </group>
+                            <group>
+                                <field name="renewable_site_longitude"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Inherit List View -->
+        <record id="view_project_project_list_inherit_solar" model="ir.ui.view">
+            <field name="name">project.project.list.inherit.solar</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="project_reference" string="Project ID"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="solar_stage" widget="badge"
+                           decoration-danger="solar_stage == 'document_pending'"
+                           decoration-warning="solar_stage == 'site_survey_scheduled'"
+                           decoration-info="solar_stage in ('application_submitted', 'design_approved', 'government_approval')"
+                           decoration-primary="solar_stage in ('installation_in_progress', 'inspection_testing')"
+                           decoration-success="solar_stage == 'system_activated'"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Inherit Kanban View -->
+        <record id="view_project_project_kanban_inherit_solar" model="ir.ui.view">
+            <field name="name">project.project.kanban.inherit.solar</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="inside">
+                    <field name="solar_stage"/>
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <div class="mt-1">
+                        <field name="solar_stage" widget="badge"
+                               decoration-danger="solar_stage == 'document_pending'"
+                               decoration-warning="solar_stage == 'site_survey_scheduled'"
+                               decoration-info="solar_stage in ('application_submitted', 'design_approved', 'government_approval')"
+                               decoration-primary="solar_stage in ('installation_in_progress', 'inspection_testing')"
+                               decoration-success="solar_stage == 'system_activated'"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</thrive>

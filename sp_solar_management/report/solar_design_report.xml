@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <record id="action_report_solar_design" model="ir.actions.report">
+        <field name="name">Solar Design</field>
+        <field name="model">solar.design</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sp_solar_management.report_solar_design_template</field>
+        <field name="report_file">sp_solar_management.report_solar_design_template</field>
+        <field name="print_report_name">'Solar_Design_%s' % (object.design_number or 'New')</field>
+        <field name="binding_model_id" ref="sp_solar_management.model_solar_design"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_solar_design_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <t t-set="o" t-value="doc"/>
+                    <div class="page">
+                        <style>
+                            .page {
+                                color: #1e293b;
+                            }
+                            .report-header-banner {
+                                background-color: #f1f5f9;
+                                text-align: center;
+                                font-weight: bold;
+                                font-size: 20px;
+                                padding: 12px 0;
+                                margin: 15px 0 25px;
+                                color: #334155;
+                                border-radius: 4px;
+                                letter-spacing: 1px;
+                                text-transform: uppercase;
+                                border: 1px solid #e2e8f0;
+                                page-break-inside: avoid !important;
+                                page-break-after: avoid !important;
+                                break-inside: avoid !important;
+                                break-after: avoid !important;
+                            }
+                            .section-title {
+                                font-weight: bold;
+                                font-size: 14px;
+                                color: #2f353dff;
+                                border-bottom: 2px solid #e2e8f0;
+                                padding-bottom: 4px;
+                                margin-top: 18px;
+                                margin-bottom: 12px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                page-break-after: avoid;
+                                break-after: avoid;
+                            }
+                            .report-section {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                                margin-bottom: 10px;
+                            }
+                            .info-row {
+                                margin-bottom: 6px;
+                                font-size: 13px;
+                                line-height: 1.5;
+                                page-break-inside: avoid;
+                                break-inside: avoid;
+                            }
+                            .info-label {
+                                font-weight: 600;
+                                color: #64748b;
+                                display: inline-block;
+                                width: 45%;
+                                vertical-align: top;
+                            }
+                            .info-value {
+                                color: #1e293b;
+                                font-weight: 500;
+                                display: inline-block;
+                                width: 50%;
+                                vertical-align: top;
+                            }
+                            table.components-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 15px;
+                                font-size: 13px;
+                                border: 1px solid #e2e8f0;
+                                border-radius: 4px;
+                                overflow: hidden;
+                            }
+                            table.components-table th {
+                                background-color: #f1f5f9;
+                                border-bottom: 2px solid #cbd5e1;
+                                text-align: left;
+                                padding: 8px 12px !important;
+                                font-weight: bold;
+                                color: #1e293b;
+                            }
+                            table.components-table td {
+                                padding: 8px 12px !important;
+                                border-bottom: 1px solid #e2e8f0;
+                                vertical-align: top;
+                                color: #334155;
+                            }
+                            .col-6 {
+                                padding-right: 15px;
+                                page-break-inside: avoid;
+                                break-inside: avoid;
+                            }
+                            .keep-together {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                            }
+                            .report-block {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                                margin-top: 18px;
+                            }
+                        </style>
+
+                        <div class="report-header-banner">
+                            Solar Design
+                        </div>
+                        <div class="report-section keep-together" t-if="doc.lead_id">
+                            <div class="section-title">Customer Details</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Customer Name:</span> <span class="info-value" t-field="doc.lead_id.partner_id.name"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Email:</span> <span class="info-value" t-field="doc.lead_id.email_from"/>
+                                </div>
+                            </div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Phone:</span> <span class="info-value" t-field="doc.lead_id.phone"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Address:</span> <span class="info-value" t-out="doc.lead_id._get_solar_contact_address()"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Technical Design</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">System Size:</span> <span class="info-value" t-field="doc.system_size"/> <span t-if="doc.system_size">kW</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">System Type:</span> <span class="info-value" t-field="doc.system_type"/>
+                                </div>
+                            </div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Expected Generation:</span> <span class="info-value" t-field="doc.expected_generation_kwh_month"/> <span t-if="doc.expected_generation_kwh_month">kWh/month</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Solar Panel Type:</span> <span class="info-value" t-field="doc.solar_panel_type"/>
+                                </div>
+                            </div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Electricity Consumption:</span> <span class="info-value" t-field="doc.current_electricity_consumption"/> <span t-if="doc.current_electricity_consumption">kWh/month</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">System Template:</span> <span class="info-value" t-field="doc.template_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Financial &amp; ROI Analysis</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">System Cost:</span> <span class="info-value" t-field="doc.total_system_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">VAT (%):</span> <span class="info-value" t-field="doc.vat_percent"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">VAT:</span> <span class="info-value" t-field="doc.vat_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Total Cost:</span> <span class="info-value" t-field="doc.total_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">System Lifetime:</span> <span class="info-value" t-field="doc.system_lifetime"/> <span>Years</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Lifetime Savings:</span> <span class="info-value" t-field="doc.lifetime_savings" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Electricity Rate:</span> <span class="info-value" t-field="doc.electricity_rate" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Monthly Savings (kWh):</span> <span class="info-value" t-field="doc.monthly_savings_kwh"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Monthly Savings:</span> <span class="info-value" t-field="doc.monthly_savings" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Annual Savings:</span> <span class="info-value" t-field="doc.annual_savings" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Payback Period:</span> <span class="info-value" t-field="doc.payback_period"/> <span>Years</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">ROI (%):</span> <span class="info-value" t-field="doc.roi_percent"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-block">
+                            <div class="report-header-banner">
+                                Equipment &amp; Components
+                            </div>
+
+                            <t t-set="has_lines" t-value="doc.solar_panel_line_ids or doc.battery_line_ids or doc.inverter_line_ids or doc.other_line_ids or doc.installation_cost or doc.transport_cost"/>
+                            <t t-if="has_lines">
+                                <table class="components-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Description</th>
+                                            <th class="text-right">Quantity</th>
+                                            <th class="text-right">Unit Price</th>
+                                            <th class="text-right">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Solar Panels Section -->
+                                        <t t-if="doc.solar_panel_line_ids">
+                                            <tr style="background-color: #f8fafc; font-weight: bold; color: #0f172a;">
+                                                <td colspan="5" style="text-align: left; padding: 8px 12px !important; border-bottom: 2px solid #cbd5e1;">Solar Panel</td>
+                                            </tr>
+                                            <tr t-foreach="doc.solar_panel_line_ids" t-as="line">
+                                                <td><span t-field="line.product_id.name"/></td>
+                                                <td><span t-field="line.name"/></td>
+                                                <td class="text-right"><span t-field="line.quantity"/></td>
+                                                <td class="text-right"><span t-field="line.unit_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                                <td class="text-right"><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            </tr>
+                                        </t>
+
+                                        <!-- Batteries Section -->
+                                        <t t-if="doc.battery_line_ids">
+                                            <tr style="background-color: #f8fafc; font-weight: bold; color: #0f172a;">
+                                                <td colspan="5" style="text-align: left; padding: 8px 12px !important; border-bottom: 2px solid #cbd5e1;">Battery</td>
+                                            </tr>
+                                            <tr t-foreach="doc.battery_line_ids" t-as="line">
+                                                <td><span t-field="line.product_id.name"/></td>
+                                                <td><span t-field="line.name"/></td>
+                                                <td class="text-right"><span t-field="line.quantity"/></td>
+                                                <td class="text-right"><span t-field="line.unit_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                                <td class="text-right"><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            </tr>
+                                        </t>
+
+                                        <!-- Inverters Section -->
+                                        <t t-if="doc.inverter_line_ids">
+                                            <tr style="background-color: #f8fafc; font-weight: bold; color: #0f172a;">
+                                                <td colspan="5" style="text-align: left; padding: 8px 12px !important; border-bottom: 2px solid #cbd5e1;">Inverter</td>
+                                            </tr>
+                                            <tr t-foreach="doc.inverter_line_ids" t-as="line">
+                                                <td><span t-field="line.product_id.name"/></td>
+                                                <td><span t-field="line.name"/></td>
+                                                <td class="text-right"><span t-field="line.quantity"/></td>
+                                                <td class="text-right"><span t-field="line.unit_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                                <td class="text-right"><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            </tr>
+                                        </t>
+
+                                        <!-- Others Equipment Section -->
+                                        <t t-if="doc.other_line_ids">
+                                            <tr style="background-color: #f8fafc; font-weight: bold; color: #0f172a;">
+                                                <td colspan="5" style="text-align: left; padding: 8px 12px !important; border-bottom: 2px solid #cbd5e1;">Others Equipment</td>
+                                            </tr>
+                                            <tr t-foreach="doc.other_line_ids" t-as="line">
+                                                <td><span t-field="line.product_id.name"/></td>
+                                                <td><span t-field="line.name"/></td>
+                                                <td class="text-right"><span t-field="line.quantity"/></td>
+                                                <td class="text-right"><span t-field="line.unit_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                                <td class="text-right"><span t-field="line.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            </tr>
+                                        </t>
+
+                                        <!-- Installation & Transport Cost Section -->
+                                        <t t-if="doc.installation_cost or doc.transport_cost">
+                                            <tr style="background-color: #f8fafc; font-weight: bold; color: #0f172a;">
+                                                <td colspan="5" style="text-align: left; padding: 8px 12px !important; border-bottom: 2px solid #cbd5e1;">Installation &amp; Transport Cost</td>
+                                            </tr>
+                                            <tr t-if="doc.installation_cost">
+                                                <td>Installation Cost</td>
+                                                <td>Installation Cost</td>
+                                                <td class="text-right">1.00</td>
+                                                <td class="text-right"><span t-field="doc.installation_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                                <td class="text-right"><span t-field="doc.installation_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            </tr>
+                                            <tr t-if="doc.transport_cost">
+                                                <td>Transport Cost</td>
+                                                <td>Transport Cost</td>
+                                                <td class="text-right">1.00</td>
+                                                <td class="text-right"><span t-field="doc.transport_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                                <td class="text-right"><span t-field="doc.transport_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            </tr>
+                                        </t>
+                                        <!-- Total Rows -->
+                                        <tr style="border-top: 2px solid #cbd5e1; font-weight: bold;">
+                                            <td colspan="4" class="text-right" style="padding: 8px 12px !important; border-bottom: none;">Subtotal</td>
+                                            <td class="text-right" style="padding: 8px 12px !important; border-bottom: none;"><span t-field="doc.total_system_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                        </tr>
+                                        <t t-if="doc.vat_amount">
+                                            <tr style="font-weight: bold;">
+                                                <td colspan="4" class="text-right" style="padding: 8px 12px !important; border-bottom: none;">VAT (<span t-field="doc.vat_percent"/>%)</td>
+                                                <td class="text-right" style="padding: 8px 12px !important; border-bottom: none;"><span t-field="doc.vat_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                            </tr>
+                                        </t>
+                                        <tr style="font-weight: bold; font-size: 14px; background-color: #f8fafc; border-top: 1px solid #cbd5e1;">
+                                            <td colspan="4" class="text-right" style="padding: 10px 12px !important; border-bottom: 2px solid #cbd5e1;">Total Cost</td>
+                                            <td class="text-right" style="padding: 10px 12px !important; border-bottom: 2px solid #cbd5e1; color: #0f172a;"><span t-field="doc.total_cost" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted mt-2">No component lines added to this design.</p>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</thrive>

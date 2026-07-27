@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <menuitem id="menu_solar_energy_root"
+              name="Solar Energy"
+              web_icon="sp_solar_management,static/description/icon.png"
+              sequence="50"/>
+
+    <!-- Dashboard Action -->
+    <record id="action_solar_dashboard" model="ir.actions.client">
+        <field name="name">Solar Dashboard</field>
+        <field name="tag">solar_dashboard</field>
+        <field name="res_model">solar.dashboard</field>
+    </record>
+
+    <menuitem id="menu_solar_dashboard"
+              name="Dashboard"
+              parent="menu_solar_energy_root"
+              action="action_solar_dashboard"
+              sequence="0"/>
+
+    <menuitem id="menu_solar_energy_configuration"
+              name="Configuration"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_manager"
+              sequence="110"/>
+
+</thrive>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="view_solar_site_inspection_wizard_form" model="ir.ui.view">
+        <field name="name">solar.site.inspection.wizard.form</field>
+        <field name="model">solar.site.inspection.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Site Inspection">
+                <group col="2">
+                    <group>
+                        <field name="inspection_type" widget="radio" options="{'horizontal': true}"/>
+                    </group>
+                </group>
+                <group string="Survey Team Details" col="2">
+                    <group>
+                        <field name="survey_team_id" invisible="inspection_type == 'remote'"/>
+                        <field name="survey_manager_id" readonly="1" invisible="inspection_type == 'remote'"/>
+                        <field name="survey_member_domain" invisible="1"/>
+                        <field name="survey_member_id" domain="survey_member_domain"/>
+                    </group>
+                    <group>
+                        <field name="inspection_date"/>
+                    </group>
+                </group>
+                <group invisible="inspection_type != 'remote' or not google_earth_url">
+                    <field name="google_earth_url" widget="url" text="Google Earth Link" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_create_site_inspection"
+                            string="Create Site Inspection"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</thrive>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive noupdate="1">
+    <record id="contract_type_extended_warranty" model="solar.contract.type">
+        <field name="name">Extended Warranty</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="contract_type_maintenance_contract" model="solar.contract.type">
+        <field name="name">Maintenance Contract</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="contract_type_monitoring_service" model="solar.contract.type">
+        <field name="name">Monitoring Service</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="contract_type_full_service" model="solar.contract.type">
+        <field name="name">Full Service (O&amp;M)</field>
+        <field name="sequence">40</field>
+    </record>
+</thrive>

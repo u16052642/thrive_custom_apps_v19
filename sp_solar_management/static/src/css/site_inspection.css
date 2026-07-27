@@ -1,0 +1,282 @@
+.o_solar_site_images_kanban .o_kanban_record,
+.o_solar_site_images_kanban .oe_kanban_card,
+.o_solar_site_images_kanban .o_kanban_renderer .oe_kanban_card,
+.o_solar_site_images_kanban .o_kanban_quick_create {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.o_form_view .o_solar_documents_page {
+    padding-top: 8px;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 32px;
+    margin-bottom: 20px;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_block {
+    min-width: 0;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_row {
+    display: grid;
+    grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_label {
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_field,
+.o_form_view .o_solar_documents_page .o_solar_doc_actions {
+    min-width: 0;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_field .o_field_widget,
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_field_widget {
+    min-width: 220px;
+    max-width: 100%;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_input_dropdown,
+.o_form_view .o_solar_documents_page .o_solar_doc_field .o_input_dropdown,
+.o_form_view .o_solar_documents_page .o_solar_doc_actions select,
+.o_form_view .o_solar_documents_page .o_solar_doc_field select {
+    width: 100%;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_field_binary,
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_field_widget[name="id_proof"],
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_field_widget[name="electric_bill"],
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_field_widget[name="ownership_proof"],
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_field_widget[name="bank_cancel_cheque"],
+.o_form_view .o_solar_documents_page .o_solar_doc_actions .o_field_widget[name="passport_size_photo"] {
+    flex: 0 1 260px;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_view_btn {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_kanban_renderer,
+.o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_kanban_records {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+    gap: 20px 32px;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_kanban_record {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_kanban_record>div {
+    width: 100%;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_field_binary,
+.o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_field_binary_file,
+.o_form_view .o_solar_documents_page .o_solar_doc_kanban .btn {
+    white-space: nowrap;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    padding: 0 0 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_label {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 600;
+}
+
+.o_form_view .o_solar_documents_page .o_solar_doc_actions {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 991.98px) {
+    .o_form_view .o_solar_documents_page .o_solar_doc_columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_kanban_renderer,
+    .o_form_view .o_solar_documents_page .o_solar_doc_kanban .o_kanban_records {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_form_view .o_solar_documents_page .o_solar_doc_row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Make dynamic list view strictly mimic native Odoo form fields */
+.o_form_view .o_solar_document_list thead,
+.o_form_view .o_solar_document_list colgroup {
+    display: none !important;
+}
+
+.o_form_view .o_solar_document_list table {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Force tbody into a strict 2-column grid */
+.o_form_view .o_solar_document_list table tbody {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 32px !important;
+    row-gap: 8px !important;
+    width: 100% !important;
+}
+
+/* Force rows to display like form groups strictly bounded within the grid cells */
+.o_form_view .o_solar_document_list table tbody tr {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background: transparent !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    /* CRITICAL: Prevents any grid bleeding */
+}
+
+@media (max-width: 991.98px) {
+    .o_form_view .o_solar_document_list table tbody {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+/* Hide Odoo's internal list elements safely */
+.o_form_view .o_solar_document_list table tbody tr td:not([name="name"]):not([name="document_file"]):not(:has(button)):not(.o_list_button) {
+    display: none !important;
+}
+
+/* Ensure the button cell aligns properly in the flex row */
+.o_form_view .o_solar_document_list table tbody tr td:has(button),
+.o_form_view .o_solar_document_list table tbody tr td.o_list_button {
+    display: block !important;
+    flex: 0 0 auto !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 0 0 12px !important;
+}
+
+/* Column 1: Acts like the Label */
+.o_form_view .o_solar_document_list table tbody tr td[name="name"] {
+    display: block !important;
+    flex: 0 0 130px !important;
+    min-width: 0 !important;
+    padding: 0 12px 0 0 !important;
+    font-weight: 700 !important;
+    color: inherit !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Column 2: Acts like the Field Value (Upload widget) */
+.o_form_view .o_solar_document_list table tbody tr td[name="document_file"] {
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 1 0% !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Force internal Odoo widget wrappers to shrink and truncate text */
+.o_form_view .o_solar_document_list table tbody tr td[name="document_file"] * {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* Visually fake the 'Upload your file' teal link on ALL empty lines before they are clicked. */
+.o_form_view .o_solar_document_list table tbody tr td[name="document_file"]>.o_field_empty::before,
+.o_form_view .o_solar_document_list table tbody tr:not(.o_selected_row) td[name="document_file"]:empty::before {
+    content: "\f093" !important;
+    /* fa-upload */
+    font-family: 'FontAwesome' !important;
+    margin-right: 6px !important;
+    color: #00d2b4 !important;
+    /* Teal */
+    font-size: 14px !important;
+    display: inline-block !important;
+}
+
+.o_form_view .o_solar_document_list table tbody tr td[name="document_file"]>.o_field_empty::after,
+.o_form_view .o_solar_document_list table tbody tr:not(.o_selected_row) td[name="document_file"]:empty::after {
+    content: "Upload your file" !important;
+    display: inline-block !important;
+    background-color: transparent !important;
+    color: #00d2b4 !important;
+    /* Teal */
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    cursor: pointer !important;
+    text-align: left !important;
+}
+
+.o_form_view .o_solar_document_list table tbody tr td[name="document_file"]>.o_field_empty:hover::after,
+.o_form_view .o_solar_document_list table tbody tr:not(.o_selected_row) td[name="document_file"]:empty:hover::after {
+    text-decoration: underline;
+}
+
+/* Custom grid for Included Services checkboxes in Solar Contracts */
+.o_solar_services_checklist {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 32px !important;
+    row-gap: 12px !important;
+    width: 100% !important;
+}
+
+@media (max-width: 767.98px) {
+    .o_solar_services_checklist {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}

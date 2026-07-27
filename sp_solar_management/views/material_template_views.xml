@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="view_solar_material_template_list" model="ir.ui.view">
+        <field name="name">solar.material.template.list</field>
+        <field name="model">solar.material.template</field>
+        <field name="arch" type="xml">
+            <list string="System Templates">
+                <field name="name"/>
+                <field name="solar_company_id"/>
+                <field name="system_size"/>
+                <field name="expected_generation_kwh_month"/>
+                <field name="system_type"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_material_template_form" model="ir.ui.view">
+        <field name="name">solar.material.template.form</field>
+        <field name="model">solar.material.template</field>
+        <field name="arch" type="xml">
+            <form string="System Template">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="name"/>
+                            <field name="solar_company_id"/>
+                        </group>
+                        <group>
+                            <field name="system_size"/>
+                            <field name="expected_generation_kwh_month"/>
+                            <field name="system_type"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Solar Panel" name="solar_panels">
+                            <field name="solar_panel_line_ids" context="{'default_line_type': 'solar_panel'}" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="1"/>
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                    <field name="subtotal" readonly="1" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Battery" name="batteries">
+                            <field name="battery_line_ids" context="{'default_line_type': 'battery'}" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="1"/>
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                    <field name="subtotal" readonly="1" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Inverter" name="inverters">
+                            <field name="inverter_line_ids" context="{'default_line_type': 'inverter'}" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="1"/>
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                    <field name="subtotal" readonly="1" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Others Equipment " name="other_components">
+                            <field name="other_line_ids" context="{'default_line_type': 'other'}" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="1"/>
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                    <field name="subtotal" readonly="1" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Project Tasks" name="project_tasks">
+                            <field name="task_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" string="Title"/>
+                                    <field name="user_ids" widget="many2many_avatar_user" string="Assignees"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_material_template" model="ir.actions.act_window">
+        <field name="name">System Templates</field>
+        <field name="res_model">solar.material.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_solar_material_template"
+              name="System Templates"
+              parent="menu_solar_energy_configuration"
+              action="action_solar_material_template"
+              sequence="20"/>
+</thrive>

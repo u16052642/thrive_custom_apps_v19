@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <record id="view_order_form_inherit_solar" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.solar</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="solar_design_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//button[@name='action_draft']" position="attributes">
+                <attribute name="invisible">state != 'cancel' or solar_design_id</attribute>
+            </xpath>
+            <xpath expr="//button[@id='action_confirm']" position="attributes">
+                <attribute name="invisible">state != 'sent' or solar_design_id</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm' and not(@id)]" position="attributes">
+                <attribute name="invisible">state != 'draft' or solar_design_id</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm' and not(@id)]" position="after">
+                <button
+                    string="Confirm"
+                    name="action_confirm"
+                    type="object"
+                    context="{'validate_analytic': True}"
+                    class="btn-primary"
+                    data-hotkey="q"
+                    confirm="Are you sure you want to confirm this order? Confirming this will cancel other quotations for this project."
+                    invisible="state not in ['draft', 'sent'] or not solar_design_id"/>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="attributes">
+                <attribute name="invisible">state not in ['draft', 'sent', 'sale'] or not id or locked or solar_design_id</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button
+                    string="Cancel"
+                    name="action_cancel"
+                    type="object"
+                    confirm="Are you sure you want to cancel this order? This will also delete the associated installation."
+                    data-hotkey="x"
+                    invisible="state not in ['draft', 'sent', 'sale'] or not id or locked or not solar_design_id"/>
+            </xpath>
+        </field>
+    </record>
+</thrive>

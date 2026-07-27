@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="seq_solar_site_inspection" model="ir.sequence">
+        <field name="name">Solar Site Inspection</field>
+        <field name="code">solar.site.inspection</field>
+        <field name="prefix">SI/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_solar_site_inspection_search" model="ir.ui.view">
+        <field name="name">solar.site.inspection.search</field>
+        <field name="model">solar.site.inspection</field>
+        <field name="arch" type="xml">
+            <search string="Site Inspections">
+                <field name="name"/>
+                <field name="lead_id"/>
+                <field name="partner_id"/>
+                <field name="salesperson_id"/>
+                <separator/>
+                <filter name="filter_my_inspections" string="My Inspections" domain="[('salesperson_id', '=', uid)]"/>
+                <filter name="filter_new" string="New" domain="[('state', '=', 'new')]"/>
+                <filter name="filter_in_progress" string="In Progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="filter_submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter name="filter_completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <filter name="filter_cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter name="filter_connection_single" string="Single Phase" domain="[('connection_type', '=', 'single_phase')]"/>
+                <filter name="filter_connection_three" string="Three Phase" domain="[('connection_type', '=', 'three_phase')]"/>
+                <filter name="filter_residential" string="Residential" domain="[('customer_category', '=', 'residential')]"/>
+                <filter name="filter_commercial" string="Commercial" domain="[('customer_category', '=', 'commercial')]"/>
+                <group>
+                    <filter name="group_service_type" string="Service Type" domain="[]" context="{'group_by': 'service_type'}"/>
+                    <filter name="group_connection_type" string="Connection Type" domain="[]" context="{'group_by': 'connection_type'}"/>
+                    <filter name="group_partner" string="Customer" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_customer_category" string="Customer Category" domain="[]" context="{'group_by': 'customer_category'}"/>
+                    <filter name="group_state" string="Status" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter name="group_salesperson" string="Salesperson" domain="[]" context="{'group_by': 'salesperson_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_solar_site_inspection_list" model="ir.ui.view">
+        <field name="name">solar.site.inspection.list</field>
+        <field name="model">solar.site.inspection</field>
+        <field name="arch" type="xml">
+            <list string="Site Inspections">
+                <field name="name"/>
+                <field name="lead_id"/>
+                <field name="partner_id"/>
+                <field name="connection_type"/>
+                <field name="customer_category"/>
+                <field name="service_type"/>
+                <field name="salesperson_id"/>
+                <field name="inspection_date"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('approved', 'completed')"
+                       decoration-info="state == 'new'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-primary="state == 'submitted'"
+                       decoration-danger="state in ('rejected', 'cancelled')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_site_inspection_form" model="ir.ui.view">
+        <field name="name">solar.site.inspection.form</field>
+        <field name="model">solar.site.inspection</field>
+        <field name="arch" type="xml">
+            <form string="Site Inspection">
+                <header>
+                    <field name="user_is_pm" invisible="1"/>
+                    <field name="user_is_tech" invisible="1"/>
+                    <field name="user_is_sales" invisible="1"/>
+                    <field name="user_is_admin" invisible="1"/>
+                    <button name="action_send_mail" string="Send by Email" type="object" class="btn-primary" data-hotkey="g" invisible="not user_is_pm or state in ('approved', 'completed', 'cancelled')"/>
+                    <button name="action_start" string="Start" type="object" class="btn-primary" invisible="not user_is_pm or state != 'new'"/>
+                    <button name="action_submit_for_approval" string="Submit" type="object" class="btn-success" invisible="not user_is_tech or state != 'in_progress'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success" invisible="not user_is_pm or state != 'submitted'"/>
+                    <button name="action_create_design" string="Create Design" type="object" class="btn-primary" invisible="not user_is_tech or state != 'approved' or design_count &gt; 0"/>
+                    <button name="action_open_reject_wizard" string="Reject" type="object" class="btn-secondary" invisible="not user_is_pm or state != 'submitted'"/>
+                    <button name="action_cancel" string="Cancel" type="object" class="btn-secondary" invisible="not user_is_pm or state in ('cancelled', 'approved', 'rejected')"/>
+                    <button name="%(sp_solar_management.action_report_solar_site_inspection)d" string="Print Report" type="action" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,in_progress,submitted,approved" invisible="state == 'rejected'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,in_progress,submitted,approved,rejected" invisible="state != 'rejected'"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_project"
+                                icon="fa-tasks"
+                                invisible="not user_is_pm or project_count == 0">
+                            <field name="project_count" widget="statinfo" string="Project"/>
+                        </button>
+                        <button name="action_view_design"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o"
+                                invisible="not (user_is_tech or user_is_pm or user_is_sales) or design_count == 0">
+                            <field name="design_count" widget="statinfo" string="Design"/>
+                        </button>
+                        <button name="action_open_google_map"
+                                type="object"
+                                string="Site Location"
+                                class="oe_stat_button"
+                                icon="fa-map-marker"
+                                invisible="not google_map_url"/>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="lead_id" placeholder="Select lead"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="project_id" readonly="1"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+
+                    <group string="Customer Details" col="2">
+                        <group>
+                            <field name="customer_name" readonly="1"/>
+                            <field name="customer_email" readonly="1"/>
+                            <field name="customer_phone" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="customer_category" readonly="1"/>
+                            <field name="service_type" readonly="1"/>
+                            <field name="contract_demand_kw" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Electricity Details" col="2">
+                        <group>
+                            <field name="connection_type" readonly="1"/>
+                            <field name="existing_connection" readonly="1"/>
+                            <field name="existing_supply_volts" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="consumer_no" readonly="1"/>
+                            <field name="monthly_electric_bill" readonly="1"/>
+                            <field name="monthly_electricity_consumption" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Site Information" col="2">
+                        <group>
+                            <field name="property_type" readonly="1"/>
+                            <field name="property_age_years" readonly="1"/>
+                            <field name="roof_type" readonly="1"/>
+                            <field name="roof_area_sqft" readonly="1"/>
+                        </group>
+                        <group>
+                            <label for="site_street" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="site_street" class="o_address_street" placeholder="Street..." readonly="1"/>
+                                <field name="site_street2" class="o_address_street" placeholder="Street 2..." readonly="1"/>
+                                <field name="site_city" class="o_address_city" placeholder="City" readonly="1"/>
+                                <field name="site_zip" class="o_address_zip" placeholder="ZIP" readonly="1"/>
+                                <field name="site_state_id" class="o_address_state" placeholder="State" readonly="1"/>
+                                <field name="site_country_id" class="o_address_country" placeholder="Country" readonly="1"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <group string="Site Location" col="2">
+                        <group>
+                            <field name="site_latitude" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="site_longitude" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Survey Team Details" col="2">
+                        <group>
+                            <field name="inspection_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="survey_team_id" invisible="inspection_type == 'remote'"/>
+                            <field name="survey_manager_id" readonly="1" invisible="inspection_type == 'remote'"/>
+                            <field name="survey_member_domain" invisible="1"/>
+                            <field name="survey_member_id" domain="survey_member_domain"/>
+                            <field name="google_earth_url" widget="url" text="Google Earth Link" invisible="inspection_type != 'remote' or not google_earth_url" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="inspection_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Approval Workflow">
+                            <group col="2">
+                                <group>
+                                    <field name="portal_submission_date" readonly="1"/>
+                                    <field name="portal_submitted_by_id" readonly="1"/>
+                                    <field name="approved_by_id" readonly="1" invisible="state != 'approved'"/>
+                                    <field name="approved_date" readonly="1" invisible="state != 'approved'"/>
+                                </group>
+                                <group>
+                                    <field name="rejected_by_id" readonly="1" invisible="state != 'rejected'"/>
+                                    <field name="rejected_date" readonly="1" invisible="state != 'rejected'"/>
+                                    <field name="rejection_reason" readonly="1" invisible="state != 'rejected'"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Technical Recommendation">
+                            <group col="2">
+                                <group>
+                                    <field name="max_installable_capacity_kw"/>
+                                    <field name="recommended_system_size_kw"/>
+                                    <field name="expected_generation_kwh_month"/>
+                                    <field name="system_type"/>
+                                </group>
+                                <group>
+                                    <field name="installation_feasible"/>
+                                    <field name="feasibility_reason" invisible="installation_feasible != 'no'"/>
+                                    <field name="estimated_project_cost"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Structural Analysis">
+                            <group col="2">
+                                <group>
+                                    <field name="roof_load_capacity_ok"/>
+                                    <field name="structure_reinforcement_required"/>
+                                    <field name="mounting_structure_type"/>
+                                </group>
+                                <group>
+                                    <field name="safety_notes"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Electrical Analysis">
+                            <group col="2">
+                                <group>
+                                    <field name="peak_load_kw"/>
+                                    <field name="backup_requirement"/>
+                                    <field name="battery_required"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Shadow Analysis">
+                            <group col="2">
+                                <group>
+                                    <field name="shadow_present"/>
+                                    <field name="shadow_percentage" invisible="shadow_present != 'yes'"/>
+                                    <field name="obstruction_type" invisible="shadow_present != 'yes'"/>
+                                </group>
+                                <group>
+                                    <field name="orientation"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Site Checklist">
+                            <field name="checklist_line_ids" context="{'default_inspection_id': id}">
+                                <list editable="bottom">
+                                    <field name="checklist_point_id" optional="hide"/>
+                                    <field name="is_ok" string="Status" widget="boolean_toggle"/>
+                                    <field name="name" string="Check Name" readonly="1"/>
+                                    <field name="description" string="Description"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Site Survey Images">
+                            <field name="image_ids" mode="kanban" context="{'default_inspection_id': id}" class="o_solar_site_images_kanban">
+                                <kanban class="o_kanban_mobile" quick_create="false" create="true">
+                                    <field name="name"/>
+                                    <field name="image_tag"/>
+                                    <field name="image"/>
+                                    <field name="sequence"/>
+                                    <control>
+                                        <create string="Add"/>
+                                    </control>
+                                    <templates>
+                                        <t t-name="card">
+                                            <div class="oe_kanban_global_click p-1">
+                                                <div class="fw-bold mb-1">
+                                                    <field name="image_tag" invisible="not image_tag"/>
+                                                    <field name="name" invisible="image_tag"/>
+                                                </div>
+                                                <div>
+                                                    <field name="image" widget="image" class="img img-fluid" options="{'size': [260, 180]}"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+                        <page string="Site Remarks">
+                            <field name="site_remarks" placeholder="Add site remarks here..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_solar_site_inspection_image_form" model="ir.ui.view">
+        <field name="name">solar.site.inspection.image.form</field>
+        <field name="model">solar.site.inspection.image</field>
+        <field name="arch" type="xml">
+            <form string="Create Site Survey Images">
+                <sheet>
+                    <field name="name" invisible="1"/>
+                    <group col="2">
+                        <group>
+                            <field name="image_tag"/>
+                        </group>
+                        <group>
+                            <field name="image" string="Image" widget="image" options="{'preview_image': 'image'}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_solar_site_inspection_checklist_form" model="ir.ui.view">
+        <field name="name">solar.site.inspection.checklist.form</field>
+        <field name="model">solar.site.inspection.checklist</field>
+        <field name="arch" type="xml">
+            <form string="Checklist Detail">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="checklist_point_id" readonly="1"/>
+                            <field name="name" string="Check Name" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_solar_site_inspection_checklist_point_list" model="ir.ui.view">
+        <field name="name">solar.site.inspection.checklist.point.list</field>
+        <field name="model">solar.site.inspection.checklist.point</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" string="Checklist Points">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_site_inspection_checklist_point_form" model="ir.ui.view">
+        <field name="name">solar.site.inspection.checklist.point.form</field>
+        <field name="model">solar.site.inspection.checklist.point</field>
+        <field name="arch" type="xml">
+            <form string="Checklist Point">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_site_inspection_checklist_point" model="ir.actions.act_window">
+        <field name="name">Checklist Points</field>
+        <field name="res_model">solar.site.inspection.checklist.point</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_solar_site_inspection_checklist_point"
+              name="Checklist Points"
+              parent="menu_solar_energy_configuration"
+              action="action_solar_site_inspection_checklist_point"
+              sequence="10"/>
+
+    <record id="action_solar_site_inspection" model="ir.actions.act_window">
+        <field name="name">Site Inspections</field>
+        <field name="res_model">solar.site.inspection</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_solar_site_inspection_search"/>
+    </record>
+
+    <menuitem id="menu_solar_site_inspection"
+              name="Site Inspections"
+              parent="menu_solar_energy_root"
+              action="action_solar_site_inspection"
+              groups="sp_solar_management.group_solar_technician,sp_solar_management.group_solar_sales"
+              sequence="4"/>
+</thrive>

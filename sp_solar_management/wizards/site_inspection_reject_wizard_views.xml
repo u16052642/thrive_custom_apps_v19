@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="view_solar_site_inspection_reject_wizard_form" model="ir.ui.view">
+        <field name="name">solar.site.inspection.reject.wizard.form</field>
+        <field name="model">solar.site.inspection.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Inspection">
+                <group>
+                    <field name="inspection_id"/>
+                    <field name="rejection_reason" placeholder="Enter reason for rejecting this inspection"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject" string="Reject" type="object" class="btn-danger"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</thrive>

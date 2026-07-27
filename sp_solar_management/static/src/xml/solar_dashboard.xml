@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="sp_solar_management.SolarDashboard">
+        <div class="solar-dashboard">
+
+            <!-- Error state from RPC exception -->
+            <div t-if="state.error" class="dashboard-error">
+                <i class="fa fa-exclamation-triangle"></i>
+                <p>Could not load dashboard: <t t-esc="state.error"/></p>
+            </div>
+
+            <!-- Loading state -->
+            <div t-if="state.loading and !state.error" class="dashboard-loading">
+                <div class="spinner"></div>
+                <p>Loading dashboard...</p>
+            </div>
+
+            <!-- Main content - relaxed condition checking only state.data -->
+            <div t-if="!state.loading and !state.error and state.data" class="dashboard-content">
+
+                <!-- Backend Error Display from fallback dict -->
+                <div t-if="state.data.error" class="alert alert-danger mb-4" style="background:#fef2f2; border:1px solid #f87171; color:#b91c1c; padding:12px; border-radius:6px;">
+                    <i class="fa fa-exclamation-circle mr-2"></i>
+                    <strong>Backend Error:</strong> <t t-esc="state.data.error"/>
+                </div>
+
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <div class="header-left">
+                        <h1>Dashboard</h1>
+                        <p class="welcome-text">Welcome back, <t t-esc="state.userName"/>!</p>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Row -->
+                <div class="kpi-row" t-if="state.data.kpi_cards">
+                    <!-- Total Leads -->
+                    <div t-if="state.data.user_rights.is_sales or state.data.user_rights.is_pm" class="kpi-card" t-on-click="openLeads">
+                        <div class="kpi-icon kpi-leads"><i class="fa fa-users"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Total Leads</span>
+                            <span class="kpi-value"><t t-esc="formatNumber(state.data.kpi_cards.total_leads)"/></span>
+                        </div>
+                    </div>
+                    <!-- Ongoing Inspections -->
+                    <div t-if="state.data.user_rights.is_tech or state.data.user_rights.is_pm" class="kpi-card" t-on-click="openInspections">
+                        <div class="kpi-icon kpi-projects"><i class="fa fa-search"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Ongoing Site Inspection</span>
+                            <span class="kpi-value"><t t-esc="formatNumber(state.data.kpi_cards.ongoing_inspections)"/></span>
+                        </div>
+                    </div>
+                    <!-- Ongoing -->
+                    <div t-if="state.data.user_rights.is_tech or state.data.user_rights.is_pm" class="kpi-card" t-on-click="openInstallations">
+                        <div class="kpi-icon kpi-ongoing"><i class="fa fa-wrench"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Ongoing Installations</span>
+                            <span class="kpi-value"><t t-esc="formatNumber(state.data.kpi_cards.ongoing_installations)"/></span>
+                        </div>
+                    </div>
+                    <!-- Completed -->
+                    <div t-if="state.data.user_rights.is_tech or state.data.user_rights.is_pm" class="kpi-card" t-on-click="openCompletedProjects">
+                        <div class="kpi-icon kpi-completed"><i class="fa fa-check-circle"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Completed Projects</span>
+                            <span class="kpi-value"><t t-esc="formatNumber(state.data.kpi_cards.completed_projects)"/></span>
+                        </div>
+                    </div>
+                    <!-- Maintenance Requests -->
+                    <div t-if="state.data.user_rights.is_tech or state.data.user_rights.is_pm" class="kpi-card" t-on-click="openMaintenanceRequests">
+                        <div class="kpi-icon kpi-maintenance"><i class="fa fa-wrench"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Maintenance Requests</span>
+                            <span class="kpi-value"><t t-esc="formatNumber(state.data.kpi_cards.maintenance_requests)"/></span>
+                        </div>
+                    </div>
+                    <!-- Revenue -->
+                    <div t-if="state.data.user_rights.is_sales or state.data.user_rights.is_finance" class="kpi-card" t-on-click="openSaleOrders">
+                        <div class="kpi-icon kpi-revenue">
+                            <span class="currency-symbol" style="font-size: 20px; font-weight: 700;"><t t-esc="state.data.currency_symbol || '₹'"/></span>
+                        </div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Total Revenue</span>
+                            <span class="kpi-value"><t t-esc="formatCurrency(state.data.kpi_cards.total_revenue)"/></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Maintenance, Operations & Revenue Summary Row -->
+                <div class="dashboard-row summary-grid-row" t-if="state.data.maintenance_summary and state.data.revenue_summary and state.data.operations_overview">
+                    <!-- Maintenance Summary Card -->
+                    <div class="dashboard-card summary-card maintenance-summary-card" t-if="state.data.user_rights.is_tech or state.data.user_rights.is_pm or state.data.user_rights.is_admin">
+                        <div class="card-header">
+                            <h3>Maintenance Summary</h3>
+                        </div>
+                        <div class="summary-card-body">
+                            <div class="maintenance-grid">
+                                <!-- Open Requests Card -->
+                                <div class="maint-sub-card sub-card-open" t-on-click="openOpenMaintenanceRequests">
+                                    <div class="sub-card-left">
+                                        <span class="sub-card-value text-success"><t t-esc="formatNumber(state.data.maintenance_summary.open_requests)"/></span>
+                                        <span class="sub-card-label text-success">Open Requests</span>
+                                    </div>
+                                    <div class="sub-card-right">
+                                        <i class="fa fa-wrench text-success"></i>
+                                    </div>
+                                </div>
+                                <!-- In Progress Card -->
+                                <div class="maint-sub-card sub-card-inprogress" t-on-click="openInProgressMaintenanceRequests">
+                                    <div class="sub-card-left">
+                                        <span class="sub-card-value text-warning"><t t-esc="formatNumber(state.data.maintenance_summary.in_progress)"/></span>
+                                        <span class="sub-card-label text-warning">In Progress</span>
+                                    </div>
+                                    <div class="sub-card-right">
+                                        <i class="fa fa-refresh text-warning icon-spin"></i>
+                                    </div>
+                                </div>
+                                <!-- Completed Card -->
+                                <div class="maint-sub-card sub-card-completed" t-on-click="openCompletedMaintenanceRequests">
+                                    <div class="sub-card-left">
+                                        <span class="sub-card-value text-info"><t t-esc="formatNumber(state.data.maintenance_summary.completed_this_month)"/></span>
+                                        <span class="sub-card-label text-info">Completed (This Month)</span>
+                                    </div>
+                                    <div class="sub-card-right">
+                                        <i class="fa fa-check-circle text-info"></i>
+                                    </div>
+                                </div>
+                                <!-- Overdue Card -->
+                                <div class="maint-sub-card sub-card-overdue" t-on-click="openOverdueMaintenanceRequests">
+                                    <div class="sub-card-left">
+                                        <span class="sub-card-value text-danger"><t t-esc="formatNumber(state.data.maintenance_summary.overdue)"/></span>
+                                        <span class="sub-card-label text-danger">Overdue</span>
+                                    </div>
+                                    <div class="sub-card-right">
+                                        <i class="fa fa-exclamation-triangle text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="summary-card-footer">
+                            <a href="#" t-on-click.prevent="openMaintenanceRequests" class="footer-link">View Maintenance <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Operations Overview Card (Middle Column) -->
+                    <div class="dashboard-card summary-card operations-summary-card" t-if="state.data.user_rights.is_tech or state.data.user_rights.is_pm or state.data.user_rights.is_office or state.data.user_rights.is_finance or state.data.user_rights.is_admin">
+                        <div class="card-header">
+                            <h3>Operations Overview</h3>
+                        </div>
+                        <div class="summary-card-body">
+                            <div class="operations-grid-vertical">
+                                <!-- Active Contracts Card -->
+                                <div class="ops-sub-card" t-on-click="openContracts">
+                                    <div class="ops-sub-content">
+                                        <div class="ops-circle-icon bg-success-circle">
+                                            <i class="fa fa-clipboard text-success"></i>
+                                        </div>
+                                        <div class="ops-text-details">
+                                            <span class="ops-sub-label">Active Contracts</span>
+                                            <span class="ops-sub-value"><t t-esc="formatNumber(state.data.operations_overview.active_contracts)"/></span>
+                                        </div>
+                                    </div>
+                                    <div class="ops-sub-footer">
+                                        <span class="ops-sub-link text-success-link">View Contracts <i class="fa fa-arrow-right"></i></span>
+                                    </div>
+                                </div>
+
+                                <!-- Active Warranties Card -->
+                                <div class="ops-sub-card" t-on-click="openWarranties">
+                                    <div class="ops-sub-content">
+                                        <div class="ops-circle-icon bg-info-circle">
+                                            <i class="fa fa-shield text-info"></i>
+                                        </div>
+                                        <div class="ops-text-details">
+                                            <span class="ops-sub-label">Active Warranties</span>
+                                            <span class="ops-sub-value"><t t-esc="formatNumber(state.data.operations_overview.active_warranties)"/></span>
+                                        </div>
+                                    </div>
+                                    <div class="ops-sub-footer">
+                                        <span class="ops-sub-link text-info-link">View Warranties <i class="fa fa-arrow-right"></i></span>
+                                    </div>
+                                </div>
+
+                                <!-- Energy Bills Card -->
+                                <div class="ops-sub-card" t-on-click="openEnergyBills">
+                                    <div class="ops-sub-content">
+                                        <div class="ops-circle-icon bg-warning-circle">
+                                            <i class="fa fa-bolt text-warning"></i>
+                                        </div>
+                                        <div class="ops-text-details">
+                                            <span class="ops-sub-label">Energy Bills</span>
+                                            <span class="ops-sub-value"><t t-esc="formatNumber(state.data.operations_overview.energy_bills)"/></span>
+                                        </div>
+                                    </div>
+                                    <div class="ops-sub-footer">
+                                        <span class="ops-sub-link text-warning-link">View Bills <i class="fa fa-arrow-right"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Summary Card -->
+                    <div class="dashboard-card summary-card revenue-summary-card" t-if="state.data.user_rights.is_sales or state.data.user_rights.is_finance or state.data.user_rights.is_pm or state.data.user_rights.is_admin">
+                        <div class="card-header">
+                            <h3>Revenue Summary</h3>
+                        </div>
+                        <div class="summary-card-body">
+                            <!-- Total Revenue Block -->
+                            <div class="total-revenue-block">
+                                <div class="tr-left">
+                                    <div class="tr-icon-container">
+                                        <i class="fa fa-credit-card"></i>
+                                    </div>
+                                    <div class="tr-details">
+                                        <span class="tr-label">Total Revenue</span>
+                                        <span class="tr-value"><t t-esc="formatCurrency(state.data.revenue_summary.total_revenue)"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sub Revenue Columns -->
+                            <div class="sub-revenue-grid">
+                                <!-- Installation Revenue -->
+                                <div class="sub-rev-item">
+                                    <div class="sub-rev-icon bg-success-light">
+                                        <i class="fa fa-wrench text-success"></i>
+                                    </div>
+                                    <div class="sub-rev-details">
+                                        <span class="sub-rev-label">Installation Revenue</span>
+                                        <span class="sub-rev-value"><t t-esc="formatCurrency(state.data.revenue_summary.installation_revenue)"/></span>
+                                    </div>
+                                </div>
+                                <!-- Maintenance Revenue -->
+                                <div class="sub-rev-item">
+                                    <div class="sub-rev-icon bg-info-light">
+                                        <i class="fa fa-file-text-o text-info"></i>
+                                    </div>
+                                    <div class="sub-rev-details">
+                                        <span class="sub-rev-label">Maintenance Revenue</span>
+                                        <span class="sub-rev-value"><t t-esc="formatCurrency(state.data.revenue_summary.maintenance_revenue)"/></span>
+                                    </div>
+                                </div>
+                                <!-- Contract Revenue -->
+                                <div class="sub-rev-item">
+                                    <div class="sub-rev-icon bg-success-light">
+                                        <i class="fa fa-handshake-o text-success"></i>
+                                    </div>
+                                    <div class="sub-rev-details">
+                                        <span class="sub-rev-label">Contract Revenue</span>
+                                        <span class="sub-rev-value"><t t-esc="formatCurrency(state.data.revenue_summary.contract_revenue)"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="summary-card-footer">
+                            <a href="#" t-on-click.prevent="openInvoices" class="footer-link">View Details <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row pipeline-sales-row" t-if="state.data.pipeline" t-att-style="pipelineSalesStyle">
+                    <!-- Pipeline Card -->
+                    <div t-if="state.data.user_rights.is_sales or state.data.user_rights.is_tech or state.data.user_rights.is_pm" class="dashboard-card pipeline-card">
+                        <div class="card-header">
+                            <h3>Project Pipeline</h3>
+                        </div>
+
+                        <!-- Stage Summary Tabs -->
+                        <div class="pipeline-tab-bar">
+                            <t t-foreach="state.data.pipeline" t-as="stage" t-key="stage.name">
+                                <div t-attf-class="pipeline-tab pipeline-tab-{{ stage_index + 1 }}">
+                                    <span class="pipeline-tab-label">
+                                        <t t-esc="stage_index + 1"/>. <t t-esc="stage.name"/>
+                                    </span>
+                                    <span class="pipeline-tab-count"><t t-esc="stage.count"/></span>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Kanban Columns -->
+                        <div class="pipeline-kanban">
+                            <t t-foreach="state.data.pipeline" t-as="stage" t-key="stage.name">
+                                <div class="kanban-col">
+                                    <div class="kanban-cards-wrapper" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                                        <t t-if="stage.records and stage.records.length">
+                                            <t t-foreach="stage.records" t-as="rec" t-key="rec_index">
+                                                <div class="kanban-card" t-att-style="((state.data.user_rights.is_pm || state.data.user_rights.is_tech) &amp;&amp; !state.data.user_rights.is_admin &amp;&amp; (stage.name == 'Lead' || stage.name == 'Document Pending' || stage.name == 'SSEG Application')) ? 'cursor: default;' : 'cursor: pointer;'" t-on-click="() => ((state.data.user_rights.is_pm || state.data.user_rights.is_tech) &amp;&amp; !state.data.user_rights.is_admin &amp;&amp; (stage.name == 'Lead' || stage.name == 'Document Pending' || stage.name == 'SSEG Application')) ? null : this.openPipelineRecord(rec)">
+                                                    <div class="kanban-ref"><t t-esc="rec.ref"/></div>
+                                                    <div class="kanban-detail"><t t-esc="rec.detail or ''"/></div>
+                                                </div>
+                                            </t>
+                                        </t>
+                                        <t t-if="!stage.records or !stage.records.length">
+                                            <div class="kanban-empty">No records</div>
+                                        </t>
+                                    </div>
+                                    <t t-if="stage.count &gt; 3 &amp;&amp; !((state.data.user_rights.is_pm || state.data.user_rights.is_tech) &amp;&amp; !state.data.user_rights.is_admin &amp;&amp; (stage.name == 'Lead' || stage.name == 'Document Pending' || stage.name == 'SSEG Application'))">
+                                        <button type="button" class="kanban-more" t-on-click="() => this.openPipelineStage(stage)">
+                                            +<t t-esc="stage.count - 3"/> More
+                                        </button>
+                                    </t>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="dashboard-card" t-if="state.data.recent_activities">
+                        <div class="card-header">
+                            <h3>Recent Activities</h3>
+                        </div>
+                        <div class="activity-list">
+                            <t t-foreach="state.data.recent_activities" t-as="act" t-key="act_index">
+                                <div class="activity-item" style="cursor: pointer;" t-on-click="() => this.openActivity(act)">
+                                    <div class="activity-icon" t-attf-style="background:{{ act.color }}20; color:{{ act.color }}">
+                                        <i t-attf-class="fa {{ act.icon }}"></i>
+                                    </div>
+                                    <div class="activity-info">
+                                        <div class="activity-title"><t t-esc="act.title"/></div>
+                                        <div class="activity-detail"><t t-esc="act.detail"/></div>
+                                    </div>
+                                    <div class="activity-time"><t t-esc="act.time"/></div>
+                                </div>
+                            </t>
+                            <t t-if="!state.data.recent_activities.length">
+                                <div class="empty-state"><i class="fa fa-history"></i><br/>No recent activities</div>
+                            </t>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- Row 3: Installations + Inventory + Purchase -->
+                <div class="dashboard-row triple-row" t-if="state.data.user_rights.is_office or state.data.user_rights.is_pm or state.data.user_rights.is_sales or state.data.user_rights.is_finance">
+                    <!-- Inventory Status -->
+                    <div class="dashboard-card" t-if="state.data.inventory_status and (state.data.user_rights.is_office or state.data.user_rights.is_pm)">
+                        <div class="card-header" style="border-bottom: none; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="color: #1e293b; font-size: 16px; font-weight: 700;">Inventory Status</h3>
+                            <a href="#" t-on-click="openInventory" style="color: #3b82f6; font-size: 13px; text-decoration: none; font-weight: 500;">View All</a>
+                        </div>
+                        <div style="background: #ffffff; margin: 16px;">
+                            <table class="inv-table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f8fafc;">
+                                        <th style="text-align: left; padding: 12px 16px; color: #1e293b; font-size: 13px; font-weight: 700; border-radius: 6px 0 0 6px;">Item</th>
+                                        <th style="text-align: left; padding: 12px 16px; color: #1e293b; font-size: 13px; font-weight: 700;">Available Stock</th>
+                                        <th style="text-align: left; padding: 12px 16px; color: #1e293b; font-size: 13px; font-weight: 700; border-radius: 0 6px 6px 0;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="state.data.inventory_status" t-as="item" t-key="item.id" t-on-click="openInventory" style="border-bottom: 1px solid #f1f5f9; cursor: pointer;">
+                                        <td style="padding: 14px 16px; color: #475569; font-size: 13.5px; font-weight: 500;"><t t-esc="item.name"/></td>
+                                        <td style="padding: 14px 16px; color: #475569; font-size: 13.5px; font-weight: 500;"><t t-esc="item.qty_str"/></td>
+                                        <td style="padding: 14px 16px; white-space: nowrap;">
+                                            <span t-attf-style="{{ item.status_code === 'good' ? 'background: #dcfce7; color: #16a34a; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block;' : (item.status_code === 'low' ? 'background: #ffedd5; color: #ea580c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block;' : 'background: #fee2e2; color: #dc2626; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block;') }}">
+                                                <t t-esc="item.status"/>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="!state.data.inventory_status.length">
+                                        <td colspan="3" class="empty-state" style="padding: 20px; text-align: center; color: #64748b;">No inventory data</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Overview -->
+                    <div class="dashboard-card purchase-card" t-if="state.data.purchase_overview and state.data.user_rights.is_office">
+                        <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+                            <h3 style="display: flex; align-items: center; gap: 8px; color: #1e293b; font-size: 15px;">
+                                <i class="fa fa-shopping-cart" style="color: #3b82f6;"></i> Purchase Overview
+                            </h3>
+                        </div>
+                        
+                        <!-- Chart Area -->
+                        <div class="chart-container" style="padding: 10px 20px;">
+                            <canvas t-ref="purchaseChart"></canvas>
+                        </div>
+
+                        <!-- Current Status -->
+                        <div class="current-status-section" style="padding: 10px 20px 20px;">
+                            <h4 style="font-size: 13px; color: #94a3b8; font-weight: 500; margin-bottom: 12px;">Current Status</h4>
+                            <div class="status-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                <div class="status-item" t-on-click="openLateReceiving" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px; cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 12px; color: #475569; font-size: 13px;">
+                                        <i class="fa fa-clock-o" style="color: #ef4444; font-size: 15px;"></i>
+                                        <span>Late Receiving</span>
+                                    </div>
+                                    <span style="color: #1e293b; font-weight: 600; font-size: 14px;"><t t-esc="state.data.purchase_overview.late_receiving"/></span>
+                                </div>
+                                <div class="status-item" t-on-click="openToReceive" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px; cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 12px; color: #475569; font-size: 13px;">
+                                        <i class="fa fa-download" style="color: #64748b; font-size: 15px;"></i>
+                                        <span>To Receive</span>
+                                    </div>
+                                    <span style="color: #1e293b; font-weight: 600; font-size: 14px;"><t t-esc="state.data.purchase_overview.to_receive"/></span>
+                                </div>
+                                <div class="status-item" t-on-click="openReceived" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px; cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 12px; color: #475569; font-size: 13px;">
+                                        <i class="fa fa-check-square-o" style="color: #10b981; font-size: 15px;"></i>
+                                        <span>Received</span>
+                                    </div>
+                                    <span style="color: #1e293b; font-weight: 600; font-size: 14px;"><t t-esc="state.data.purchase_overview.received"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Overview Card -->
+                    <div class="dashboard-card sales-card" t-if="state.data.sales_overview and (state.data.user_rights.is_sales or state.data.user_rights.is_finance)">
+                        <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+                            <h3 style="display: flex; align-items: center; gap: 8px; color: #1e293b; font-size: 15px;">
+                                <i class="fa fa-line-chart" style="color: #8b5cf6;"></i> Sales &amp; Orders
+                            </h3>
+                        </div>
+                        
+                        <!-- Chart Area -->
+                        <div class="chart-container" style="padding: 10px 20px;">
+                            <canvas t-ref="salesChart"></canvas>
+                        </div>
+
+                        <!-- Current Status -->
+                        <div class="current-status-section" style="padding: 10px 20px 20px;">
+                            <h4 style="font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 12px;">Current Status</h4>
+                            <div class="status-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                <div class="status-item" t-on-click="openQuotations" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px; cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 12px; color: #475569; font-size: 13px;">
+                                        <i class="fa fa-file-text-o" style="color: #3b82f6;"></i>
+                                        <span>Quotations</span>
+                                    </div>
+                                    <span style="color: #1e293b; font-weight: 600; font-size: 14px;"><t t-esc="state.data.sales_overview.quotations"/></span>
+                                </div>
+                                <div class="status-item" t-on-click="openSaleOrders" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px; cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 12px; color: #475569; font-size: 13px;">
+                                        <i class="fa fa-check-circle-o" style="color: #10b981;"></i>
+                                        <span>Sale Orders</span>
+                                    </div>
+                                    <span style="color: #1e293b; font-weight: 600; font-size: 14px;"><t t-esc="state.data.sales_overview.sale_orders"/></span>
+                                </div>
+                                <div class="status-item" t-on-click="openPendingOrders" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px; cursor: pointer;">
+                                    <div style="display: flex; align-items: center; gap: 12px; color: #475569; font-size: 13px;">
+                                        <i class="fa fa-clock-o" style="color: #f59e0b;"></i>
+                                        <span>Pending Orders</span>
+                                    </div>
+                                    <span style="color: #1e293b; font-weight: 600; font-size: 14px;"><t t-esc="state.data.sales_overview.pending_orders"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- end dashboard-content -->
+        </div>
+    </t>
+</templates>

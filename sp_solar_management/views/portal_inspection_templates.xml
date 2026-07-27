@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <template id="portal_my_home_inspection" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-set="portal_service_category_enable" t-value="True"/>
+        </xpath>
+        <div id="portal_service_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/project/static/src/img/tasks.svg'"/>
+                <t t-set="title">Inspections</t>
+                <t t-set="url" t-value="'/my/inspections'"/>
+                <t t-set="text">Review and update your site inspections</t>
+                <t t-set="placeholder_count" t-value="'inspection_count'"/>
+            </t>
+        </div>
+    </template>
+
+    <template id="portal_my_inspections" name="My Inspections">
+        <t t-call="portal.portal_layout">
+            <div class="o_portal_wrap">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="mb-0">My Inspections</h2>
+                </div>
+                <t t-if="not inspections">
+                    <div class="alert alert-info" role="alert">
+                        No inspections are assigned to your login.
+                    </div>
+                </t>
+                <t t-if="inspections">
+                    <table class="table table-hover o_portal_my_doc_table">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Customer</th>
+                                <th>Inspection Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="inspections"
+                                t-as="inspection"
+                                class="o_clickable_row"
+                                t-att-data-href="'/my/inspections/%s' % inspection.id">
+                                <td>
+                                    <a t-attf-href="/my/inspections/#{inspection.id}">
+                                        <t t-out="inspection.name"/>
+                                    </a>
+                                </td>
+                                <td><t t-out="inspection.customer_name or inspection.partner_id.display_name or '-'"/></td>
+                                <td><t t-out="inspection.inspection_date or '-'"/></td>
+                                <td><t t-out="dict(inspection._fields['state'].selection).get(inspection.state)"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div t-if="pager" class="o_portal_pager d-flex justify-content-center my-3">
+                        <t t-call="portal.pager"/>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_inspection_page" name="Portal Inspection Form">
+        <t t-call="portal.portal_layout">
+            <t t-set="portal_readonly" t-value="inspection.state in ('approved', 'completed', 'cancelled')"/>
+            <div class="o_portal_wrap o_portal_inspection_page">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                    <div>
+                        <h2 class="mb-1">Site Inspection</h2>
+                        <div class="text-muted small fw-semibold mb-2">
+                            <t t-out="inspection.name"/>
+                        </div>
+                        <div class="text-muted">
+                            <span class="me-3">Status: <t t-out="dict(inspection._fields['state'].selection).get(inspection.state)"/></span>
+                            <label class="me-2" for="inspection_date">Inspection Date:</label>
+                            <input type="date"
+                                   id="inspection_date"
+                                   name="inspection_date"
+                                   form="portal_inspection_form"
+                                   class="form-control form-control-sm d-inline-block w-auto"
+                                   t-att-value="inspection.inspection_date"
+                                   t-att-disabled="'disabled' if portal_readonly else None"/>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a t-if="inspection.google_map_url"
+                           t-att-href="inspection.google_map_url"
+                           target="_blank"
+                           class="o_inspection_address_btn">
+                            <i class="fa fa-map-marker" aria-hidden="true"/>
+                            View Site Location
+                        </a>
+                        <a href="/my/inspections" class="btn btn-outline-secondary">Back to Inspections</a>
+                    </div>
+                </div>
+
+                <t t-if="request.params.get('submitted')">
+                    <div class="alert alert-success" role="alert">
+                        Inspection submitted successfully.
+                    </div>
+                </t>
+                <t t-if="request.params.get('locked') or portal_readonly">
+                    <div class="alert alert-info" role="alert">
+                        This inspection is approved and is now read-only.
+                    </div>
+                </t>
+
+                <form id="portal_inspection_form" t-attf-action="/my/inspections/#{inspection.id}/submit" method="post" enctype="multipart/form-data" class="oe_website_form">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <fieldset t-att-disabled="'disabled' if portal_readonly else None" t-att-class="'o_portal_readonly_form' if portal_readonly else None">
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Customer Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="o_portal_simple_info_grid">
+                                <div class="o_portal_simple_info_item">
+                                    <span class="o_portal_simple_info_label">Customer :</span>
+                                    <span class="o_portal_simple_info_value"><t t-out="inspection.customer_name or inspection.partner_id.display_name or '-'"/></span>
+                                </div>
+                                <div class="o_portal_simple_info_item">
+                                    <span class="o_portal_simple_info_label">Email :</span>
+                                    <span class="o_portal_simple_info_value"><t t-out="inspection.customer_email or inspection.partner_id.email or '-'"/></span>
+                                </div>
+                                <div class="o_portal_simple_info_item">
+                                    <span class="o_portal_simple_info_label">Phone :</span>
+                                    <span class="o_portal_simple_info_value"><t t-out="inspection.customer_phone or inspection.partner_id.phone or '-'"/></span>
+                                </div>
+                                <div class="o_portal_simple_info_item">
+                                    <span class="o_portal_simple_info_label">Lead :</span>
+                                    <span class="o_portal_simple_info_value"><t t-out="inspection.lead_id.display_name or '-'"/></span>
+                                </div>
+                                <div class="o_portal_simple_info_item">
+                                    <span class="o_portal_simple_info_label">Survey Manager :</span>
+                                    <span class="o_portal_simple_info_value"><t t-out="inspection.survey_manager_id.display_name or '-'"/></span>
+                                </div>
+                                <div class="o_portal_simple_info_item o_portal_simple_info_item_full">
+                                    <span class="o_portal_simple_info_label">Site Address :</span>
+                                    <span class="o_portal_simple_info_value">
+                                        <t t-if="inspection.site_street or inspection.site_street2 or inspection.site_city or inspection.site_zip">
+                                            <span t-if="inspection.site_street" t-out="inspection.site_street"/>
+                                            <span t-if="inspection.site_street2">
+                                                <t t-if="inspection.site_street">, </t>
+                                                <t t-out="inspection.site_street2"/>
+                                            </span>
+                                            <span t-if="inspection.site_city">
+                                                <t t-if="inspection.site_street or inspection.site_street2">, </t>
+                                                <t t-out="inspection.site_city"/>
+                                            </span>
+                                            <span t-if="inspection.site_zip">
+                                                <t t-if="inspection.site_street or inspection.site_street2 or inspection.site_city"> - </t>
+                                                <t t-out="inspection.site_zip"/>
+                                            </span>
+                                        </t>
+                                        <t t-if="not (inspection.site_street or inspection.site_street2 or inspection.site_city or inspection.site_zip)">-</t>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Electricity Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Connection Type</label>
+                                    <select name="connection_type" class="form-select">
+                                        <option value="">Select connection type</option>
+                                        <t t-foreach="connection_type_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.lead_id.renewable_connection_type == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Existing Connection</label>
+                                    <select name="existing_connection" class="form-select">
+                                        <option value="">Select connection</option>
+                                        <t t-foreach="existing_connection_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.lead_id.renewable_existing_connection == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Existing Supply Volts</label>
+                                    <input type="number" step="0.01" name="existing_supply_volts" class="form-control" t-att-value="inspection.lead_id.renewable_existing_supply_volts or 0.0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Customer Category</label>
+                                    <select name="customer_category" class="form-select">
+                                        <option value="">Select category</option>
+                                        <t t-foreach="customer_category_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.lead_id.renewable_site_usage == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Service Type</label>
+                                    <select name="service_type" class="form-select">
+                                        <option value="">Select service type</option>
+                                        <t t-foreach="service_type_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.lead_id.renewable_service_type == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Contract Demand (kW)</label>
+                                    <input type="number" step="0.01" name="contract_demand_kw" class="form-control" t-att-value="inspection.lead_id.renewable_contract_demand_kw or 0.0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Consumer No</label>
+                                    <input type="text" name="consumer_no" class="form-control" t-att-value="inspection.lead_id.renewable_consumer_no or ''"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Monthly Electric Bill</label>
+                                    <input type="number" step="0.01" name="monthly_electric_bill" class="form-control" t-att-value="inspection.lead_id.renewable_monthly_electric_bill or 0.0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Monthly Electricity Consumption (kWh)</label>
+                                    <input type="number" step="0.01" name="monthly_electricity_consumption" class="form-control" t-att-value="inspection.lead_id.renewable_monthly_electricity_consumption or 0.0"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Site Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Type of Property</label>
+                                    <select name="property_type" class="form-select">
+                                        <option value="">Select property type</option>
+                                        <t t-foreach="property_type_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.lead_id.renewable_property_type == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Age of Property (Years)</label>
+                                    <input type="number" step="1" name="property_age_years" class="form-control" t-att-value="inspection.lead_id.renewable_property_age_years or 0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Roof Type</label>
+                                    <select name="roof_type" class="form-select">
+                                        <option value="">Select roof type</option>
+                                        <t t-foreach="roof_type_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.lead_id.renewable_roof_type == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Roof Area (Sq. Ft.)</label>
+                                    <input type="number" step="0.01" name="roof_area_sqft" class="form-control" t-att-value="inspection.lead_id.renewable_roof_area_sqft or 0.0"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Technical Recommendation</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Max Installable Capacity (kW)</label>
+                                    <input type="number" step="0.01" name="max_installable_capacity_kw" class="form-control" t-att-value="inspection.max_installable_capacity_kw or 0.0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Recommended System Size (kW)</label>
+                                    <input type="number" step="0.01" name="recommended_system_size_kw" class="form-control" t-att-value="inspection.recommended_system_size_kw or 0.0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Expected Generation (kWh/month)</label>
+                                    <input type="number" step="0.01" name="expected_generation_kwh_month" class="form-control" t-att-value="inspection.expected_generation_kwh_month or 0.0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">System Type</label>
+                                    <select name="system_type" class="form-select">
+                                        <option value="">Select system type</option>
+                                        <t t-foreach="system_type_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.system_type == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Shadow &amp; Obstruction Analysis</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Shadow Present</label>
+                                    <select name="shadow_present" class="form-select">
+                                        <option value="">Select yes or no</option>
+                                        <t t-foreach="shadow_present_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.shadow_present == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 o_portal_dependent_field" data-controller="shadow_present" data-when="yes" data-required="1">
+                                    <label class="form-label">Shadow Percentage (%)</label>
+                                    <input type="number" step="0.01" name="shadow_percentage" class="form-control" t-att-value="inspection.shadow_percentage or 0.0" data-required-when="shadow_present=yes"/>
+                                </div>
+                                <div class="col-md-3 o_portal_dependent_field" data-controller="shadow_present" data-when="yes" data-required="1">
+                                    <label class="form-label">Obstruction Type</label>
+                                    <select name="obstruction_type" class="form-select">
+                                        <option value="">Select obstruction</option>
+                                        <t t-foreach="obstruction_type_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.obstruction_type == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Orientation</label>
+                                    <select name="orientation" class="form-select">
+                                        <option value="">Select orientation</option>
+                                        <t t-foreach="orientation_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.orientation == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Electrical Load Analysis</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Current Peak Load (kW)</label>
+                                    <input type="number" step="0.01" name="peak_load_kw" class="form-control" t-att-value="inspection.peak_load_kw or 0.0"/>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Backup Requirement</label>
+                                    <select name="backup_requirement" class="form-select">
+                                        <option value="">Select yes or no</option>
+                                        <t t-foreach="backup_requirement_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.backup_requirement == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 o_portal_dependent_field" data-controller="backup_requirement" data-when="yes" data-required="1">
+                                    <label class="form-label">Battery Required</label>
+                                    <select name="battery_required" class="form-select">
+                                        <option value="">Select yes or no</option>
+                                        <t t-foreach="battery_required_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.battery_required == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Structural Safety</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Roof Load Capacity OK</label>
+                                    <select name="roof_load_capacity_ok" class="form-select">
+                                        <option value="">Select yes or no</option>
+                                        <t t-foreach="roof_load_capacity_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.roof_load_capacity_ok == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 o_portal_dependent_field" data-controller="roof_load_capacity_ok" data-when="no">
+                                    <label class="form-label">Structure Reinforcement Required</label>
+                                    <select name="structure_reinforcement_required" class="form-select">
+                                        <option value="">Select yes or no</option>
+                                        <t t-foreach="roof_load_capacity_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.structure_reinforcement_required == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Mounting Structure Type</label>
+                                    <select name="mounting_structure_type" class="form-select">
+                                        <option value="">Select type</option>
+                                        <t t-foreach="mounting_structure_type_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.mounting_structure_type == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Risk Assessment</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Installation Risk Level</label>
+                                    <select name="installation_risk_level" class="form-select">
+                                        <option value="">Select risk level</option>
+                                        <t t-foreach="risk_level_options" t-as="option">
+                                            <option t-att-value="option[0]" t-att-selected="'selected' if inspection.installation_risk_level == option[0] else None"><t t-out="option[1]"/></option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Safety Notes</label>
+                                    <textarea name="safety_notes" class="form-control" rows="3"><t t-out="inspection.safety_notes or ''"/></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                <h4 class="mb-0">Checklist</h4>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="add_checklist_line">
+                                    Add Checklist Point
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="portal_hidden_checklist_inputs" class="o_portal_hidden_inputs"/>
+                            <div id="portal_checklist_lines">
+                                <t t-if="checklist_lines">
+                                    <div t-foreach="checklist_lines" t-as="line" class="border rounded p-3 mb-3 checklist-line" t-att-data-checklist-id="line.id">
+                                        <input type="hidden" name="checklist_keys" t-att-value="line.id"/>
+                                        <div class="row g-3 align-items-start">
+                                            <div class="col-lg-5">
+                                                <label class="form-label">Checklist Point</label>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       t-att-name="'checklist_name_%s' % line.id"
+                                                       t-att-value="line.name or ''"/>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <label class="form-label">Description</label>
+                                                <textarea class="form-control o_portal_checklist_description"
+                                                          rows="1"
+                                                          t-att-name="'checklist_description_%s' % line.id"><t t-out="line.description or ''"/></textarea>
+                                            </div>
+                                            <div class="col-12 d-flex justify-content-end">
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger o_portal_checklist_delete"
+                                                        t-att-data-checklist-id="line.id">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="not checklist_lines">
+                                    <div class="text-muted" id="portal_no_checklist_message">No predefined checklist points are available for this inspection.</div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">Site Remarks</h4>
+                        </div>
+                        <div class="card-body">
+                            <textarea name="site_remarks" class="form-control" rows="5"><t t-out="inspection.site_remarks or ''"/></textarea>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <div class="o_portal_image_toolbar">
+                                <div class="o_portal_image_intro">
+                                    <h4 class="mb-1">Site Survey Images</h4>
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm o_portal_add_image_btn" id="open_image_modal">
+                                    Add Image
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="o_portal_image_section">
+                                <div id="portal_image_lines" class="o_portal_image_grid"/>
+                                <div id="portal_hidden_image_inputs" class="o_portal_hidden_inputs"/>
+
+                                <t t-if="image_lines">
+                                    <div class="o_portal_section_title">
+                                        <h5 class="mb-0">Uploaded Images</h5>
+                                    </div>
+                                    <div class="o_portal_image_grid">
+                                        <div t-foreach="image_lines" t-as="image" class="o_portal_gallery_card">
+                                            <img t-if="image.image"
+                                                 t-att-src="image_data_uri(image.image)"
+                                                 t-att-alt="image.name"/>
+                                            <div class="o_portal_gallery_body">
+                                                <div t-if="image.image_tag" class="o_portal_gallery_tag" t-out="image.image_tag"/>
+                                                <div t-if="not image.image_tag" class="o_portal_gallery_tag">Image</div>
+                                                <div class="o_portal_gallery_actions">
+                                                    <span class="o_portal_image_meta">Saved</span>
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-danger o_portal_gallery_delete"
+                                                            t-att-formaction="'/my/inspections/%s/images/%s/delete' % (inspection.id, image.id)"
+                                                            formmethod="post">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="not image_lines">
+                                    <div class="o_portal_image_meta" id="portal_no_saved_images_message">
+                                        No images yet. Use <strong>Add Image</strong> to add the first photo.
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    </fieldset>
+
+                    <div t-if="not portal_readonly" class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Submit Inspection</button>
+                    </div>
+                </form>
+                <div id="portal_image_modal" class="o_portal_image_modal" aria-hidden="true">
+                    <div class="o_portal_image_modal_dialog">
+                        <div class="o_portal_image_modal_header">
+                            <div>
+                                <h5 class="mb-1">Add Site Image</h5>
+                                <div class="text-muted small">Select the image and add a tag before saving it to the page.</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="close_image_modal">Close</button>
+                        </div>
+                        <div class="o_portal_image_modal_body">
+                            <div class="o_portal_image_modal_grid">
+                                <div>
+                                    <div class="mb-3">
+                                        <label for="portal_modal_image_tag" class="form-label">Image Tag</label>
+                                        <input type="text" id="portal_modal_image_tag" class="form-control" placeholder="Enter image tag"/>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label for="portal_modal_image_file" class="form-label">Select Image</label>
+                                        <input type="file" id="portal_modal_image_file" class="form-control" accept="image/*"/>
+                                    </div>
+                                </div>
+                                <div id="portal_modal_image_preview" class="o_pending_image_preview">
+                                    <div class="o_pending_image_placeholder">
+                                        Preview will appear here after selecting an image.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="o_portal_image_modal_footer">
+                            <button type="button" class="btn btn-outline-secondary" id="cancel_image_modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="save_image_modal">Save Image</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</thrive>

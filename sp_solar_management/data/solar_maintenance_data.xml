@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <data noupdate="1">
+        <!-- Issue Categories -->
+        <record id="issue_category_panel_damage" model="solar.maintenance.issue.category">
+            <field name="name">Panel Damage</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="issue_category_inverter_fault" model="solar.maintenance.issue.category">
+            <field name="name">Inverter Fault</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="issue_category_battery_fault" model="solar.maintenance.issue.category">
+            <field name="name">Battery Fault</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="issue_category_low_generation" model="solar.maintenance.issue.category">
+            <field name="name">Low Generation</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="issue_category_electrical_issue" model="solar.maintenance.issue.category">
+            <field name="name">Electrical Issue</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="issue_category_monitoring_issue" model="solar.maintenance.issue.category">
+            <field name="name">Monitoring Issue</field>
+            <field name="sequence">60</field>
+        </record>
+        <record id="issue_category_cleaning_required" model="solar.maintenance.issue.category">
+            <field name="name">Cleaning Required</field>
+            <field name="sequence">70</field>
+        </record>
+
+        <!-- Visit Types -->
+        <record id="visit_type_onsite_visit" model="solar.maintenance.visit.type">
+            <field name="name">On-Site Visit</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="visit_type_remote_support" model="solar.maintenance.visit.type">
+            <field name="name">Remote Support</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="visit_type_emergency_visit" model="solar.maintenance.visit.type">
+            <field name="name">Emergency Visit</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="visit_type_warranty_visit" model="solar.maintenance.visit.type">
+            <field name="name">Warranty Visit</field>
+            <field name="sequence">40</field>
+        </record>
+    </data>
+</thrive>

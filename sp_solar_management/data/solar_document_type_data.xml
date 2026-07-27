@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <data noupdate="1">
+        <record id="solar_doc_type_interconnection_agreement" model="solar.document.type">
+            <field name="name">Interconnection Agreement</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="solar_doc_type_net_metering_agreement" model="solar.document.type">
+            <field name="name">Net Metering Agreement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="solar_doc_type_inspection_certificate" model="solar.document.type">
+            <field name="name">Inspection Certificate</field>
+            <field name="sequence">5</field>
+        </record>
+        <record id="solar_doc_type_insurance_certificate" model="solar.document.type">
+            <field name="name">Insurance Certificate</field>
+            <field name="sequence">6</field>
+        </record>
+        <record id="solar_doc_type_warranty_certificate" model="solar.document.type">
+            <field name="name">Warranty Certificate</field>
+            <field name="sequence">7</field>
+        </record>
+        <record id="solar_doc_type_other" model="solar.document.type">
+            <field name="name">Other</field>
+            <field name="sequence">99</field>
+        </record>
+    </data>
+</thrive>

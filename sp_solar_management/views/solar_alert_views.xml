@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+
+    <!-- List View -->
+    <record id="view_solar_installation_alert_list" model="ir.ui.view">
+        <field name="name">solar.installation.alert.list</field>
+        <field name="model">solar.installation.alert</field>
+        <field name="arch" type="xml">
+            <list string="Alerts">
+                <field name="name" string="Alert Title"/>
+                <field name="installation_id"/>
+                <field name="alert_type"/>
+                <field name="severity" widget="badge"
+                       decoration-danger="severity == 'critical'"
+                       decoration-warning="severity == 'high'"
+                       decoration-info="severity == 'medium'"
+                       decoration-success="severity == 'low'"/>
+                <field name="state" string="Status" widget="badge"
+                       decoration-danger="state == 'new'"
+                       decoration-warning="state == 'acknowledged'"
+                       decoration-info="state == 'in_progress'"
+                       decoration-success="state == 'resolved'"/>
+                <field name="create_date" string="Created on"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_solar_installation_alert_form" model="ir.ui.view">
+        <field name="name">solar.installation.alert.form</field>
+        <field name="model">solar.installation.alert</field>
+        <field name="arch" type="xml">
+            <form string="Alert">
+                <header>
+                    <button name="action_acknowledge"
+                            string="Acknowledge"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'new'"/>
+                    <button name="action_create_maintenance"
+                            string="Create Maintenance"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="maintenance_request_id or state == 'resolved'"/>
+                    <button name="action_resolve"
+                            string="Resolve"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state in ('new', 'resolved')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,acknowledged,in_progress,resolved" clickable="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. panel crack"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <!-- Left Group -->
+                        <group>
+                            <field name="installation_id"/>
+                            <field name="equipment_id"/>
+                            <field name="alert_type"/>
+                            <field name="severity"/>
+                        </group>
+                        <!-- Right Group -->
+                        <group>
+                            <field name="acknowledged_by_id"/>
+                            <field name="acknowledged_date"/>
+                            <field name="resolved_date"/>
+                            <field name="maintenance_request_id" readonly="1" invisible="not maintenance_request_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="DESCRIPTION" name="description_page">
+                            <field name="description" placeholder="Describe the alert issue in detail..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_solar_installation_alert_search" model="ir.ui.view">
+        <field name="name">solar.installation.alert.search</field>
+        <field name="model">solar.installation.alert</field>
+        <field name="arch" type="xml">
+            <search string="Alerts">
+                <field name="name"/>
+                <field name="installation_id"/>
+                <field name="equipment_id"/>
+                <field name="alert_type"/>
+                <filter name="new" string="New" domain="[('state','=','new')]"/>
+                <filter name="acknowledged" string="Acknowledged" domain="[('state','=','acknowledged')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('state','=','in_progress')]"/>
+                <filter name="resolved" string="Resolved" domain="[('state','=','resolved')]"/>
+                <separator/>
+                <filter name="critical" string="Critical Severity" domain="[('severity','=','critical')]"/>
+                <filter name="high" string="High Severity" domain="[('severity','=','high')]"/>
+                <group>
+                    <filter string="Installation" name="group_installation" context="{'group_by': 'installation_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'state'}"/>
+                    <filter string="Alert Type" name="group_type" context="{'group_by': 'alert_type'}"/>
+                    <filter string="Severity" name="group_severity" context="{'group_by': 'severity'}"/>
+                </group>
+
+            </search>
+        </field>
+    </record>
+
+
+    <!-- Window Action -->
+    <record id="action_solar_installation_alert" model="ir.actions.act_window">
+        <field name="name">Alerts</field>
+        <field name="res_model">solar.installation.alert</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_solar_installation_alert_search"/>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+</thrive>

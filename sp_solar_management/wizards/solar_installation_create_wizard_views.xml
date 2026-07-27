@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="view_solar_installation_create_wizard_form" model="ir.ui.view">
+        <field name="name">solar.installation.create.wizard.form</field>
+        <field name="model">solar.installation.create.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Installation">
+                <group>
+                    <group>
+                        <field name="installation_type" widget="radio" options="{'horizontal': true}"/>
+                    </group>
+                </group>
+
+                <group invisible="installation_type != 'in_house'">
+                    <group>
+                        <field name="team_id" required="installation_type == 'in_house'"/>
+                        <field name="project_manager_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="team_engineer_ids" widget="many2many_tags" readonly="1"/>
+                    </group>
+                </group>
+
+                <group invisible="installation_type != 'subcontracted'">
+                    <group>
+                        <field name="subcontractor_id" required="installation_type == 'subcontracted'"/>
+                        <field name="contact_person" required="installation_type == 'subcontracted'"/>
+                    </group>
+                    <group>
+                        <field name="phone" required="installation_type == 'subcontracted'"/>
+                    </group>
+                </group>
+
+                <footer>
+                    <button name="action_create_installation" string="Create Installation" type="object" class="btn-primary"/>
+                    <button name="action_cancel" string="Cancel" type="object" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_installation_create_wizard" model="ir.actions.act_window">
+        <field name="name">Create Installation</field>
+        <field name="res_model">solar.installation.create.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</thrive>

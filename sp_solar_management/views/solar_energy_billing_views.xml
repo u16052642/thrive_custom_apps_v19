@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+
+    <!-- Sequence for Billing Reference -->
+    <record id="sequence_solar_energy_billing" model="ir.sequence">
+        <field name="name">Solar Energy Billing</field>
+        <field name="code">solar.energy.billing</field>
+        <field name="prefix">SB-</field>
+        <field name="padding">5</field>
+        <field name="use_date_range">False</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Billing List View -->
+    <record id="view_solar_energy_billing_tree" model="ir.ui.view">
+        <field name="name">solar.energy.billing.tree</field>
+        <field name="model">solar.energy.billing</field>
+        <field name="arch" type="xml">
+            <list string="Energy Billing">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="billing_period"/>
+                <field name="net_amount" sum="Total Net Amount"/>
+                <field name="energy_produced" sum="Total Produced"/>
+                <field name="energy_exported" sum="Total Exported"/>
+                <field name="energy_imported" sum="Total Imported"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Billing Form View -->
+    <record id="view_solar_energy_billing_form" model="ir.ui.view">
+        <field name="name">solar.energy.billing.form</field>
+        <field name="model">solar.energy.billing</field>
+        <field name="arch" type="xml">
+            <form string="Energy Billing">
+                <header>
+                    <button name="action_confirm"
+                            string="Confirm"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_invoice"
+                            string="Create Invoice"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_pay"
+                            string="Register Payment"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'invoiced'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,invoiced,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <!-- Left Column -->
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="installation_id"/>
+                            <field name="billing_date"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                        <!-- Right Column -->
+                        <group>
+                            <field name="energy_produced"/>
+                            <field name="energy_exported"/>
+                            <field name="energy_imported"/>
+                            <field name="energy_self_consumed" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <!-- Rates Section -->
+                        <group string="RATES">
+                            <field name="export_rate"/>
+                            <field name="import_rate"/>
+                            <field name="net_metering_credit"/>
+                        </group>
+                        <!-- Amounts Section -->
+                        <group string="AMOUNTS">
+                            <field name="export_revenue" readonly="1"/>
+                            <field name="import_cost" readonly="1"/>
+                            <field name="net_amount" readonly="1"/>
+                            <field name="invoice_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Billing Search View -->
+    <record id="view_solar_energy_billing_search" model="ir.ui.view">
+        <field name="name">solar.energy.billing.search</field>
+        <field name="model">solar.energy.billing</field>
+        <field name="arch" type="xml">
+            <search string="Search Energy Billing">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="project_id"/>
+                <field name="installation_id"/>
+                <field name="billing_period"/>
+                <group>
+                    <filter string="Customer" name="group_by_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Project" name="group_by_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                    <filter string="Billing Period" name="group_by_period" domain="[]" context="{'group_by': 'billing_period'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Energy Billing -->
+    <record id="action_solar_energy_billing" model="ir.actions.act_window">
+        <field name="name">Energy Billing</field>
+        <field name="res_model">solar.energy.billing</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_solar_energy_billing_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Energy Billing record
+            </p>
+            <p>
+                Track customer solar energy production, export, import, rates, and savings calculations.
+            </p>
+        </field>
+    </record>
+
+</thrive>

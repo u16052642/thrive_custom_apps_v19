@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="seq_solar_design" model="ir.sequence">
+        <field name="name">Solar Design</field>
+        <field name="code">solar.design</field>
+        <field name="prefix">DES/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_solar_design_search" model="ir.ui.view">
+        <field name="name">solar.design.search</field>
+        <field name="model">solar.design</field>
+        <field name="arch" type="xml">
+            <search string="Solar Designs">
+                <field name="design_number"/>
+                <field name="lead_id"/>
+                <field name="inspection_id"/>
+                <field name="template_id"/>
+                <field name="design_status"/>
+                <field name="system_type"/>
+                <group>
+                    <filter name="group_lead" string="Lead" domain="[]" context="{'group_by': 'lead_id'}"/>
+                    <filter name="group_status" string="Status" domain="[]" context="{'group_by': 'design_status'}"/>
+                    <filter name="group_type" string="System Type" domain="[]" context="{'group_by': 'system_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_solar_design_list" model="ir.ui.view">
+        <field name="name">solar.design.list</field>
+        <field name="model">solar.design</field>
+        <field name="arch" type="xml">
+            <list string="Solar Designs">
+                <field name="design_number"/>
+                <field name="lead_id"/>
+                <field name="inspection_id"/>
+                <field name="template_id"/>
+                <field name="design_status" widget="badge"
+                       decoration-info="design_status == 'draft'"
+                       decoration-primary="design_status == 'submitted'"
+                       decoration-success="design_status == 'approved'"
+                       decoration-danger="design_status == 'rejected'"/>
+                <field name="system_size"/>
+                <field name="expected_generation_kwh_month"/>
+                <field name="current_electricity_consumption"/>
+                <field name="system_type"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_design_form" model="ir.ui.view">
+        <field name="name">solar.design.form</field>
+        <field name="model">solar.design</field>
+        <field name="arch" type="xml">
+            <form string="Solar Design Proposal">
+                <header>
+                    <field name="user_is_tech" invisible="1"/>
+                    <field name="user_is_pm" invisible="1"/>
+                    <field name="user_is_sales" invisible="1"/>
+                    <button name="action_submit_for_approval" string="Submit" type="object" class="btn-primary" invisible="not user_is_tech or design_status != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success" invisible="not user_is_pm or design_status != 'submitted'"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-secondary" invisible="not user_is_pm or design_status != 'submitted'"/>
+                    <button name="action_create_quotation" string="Create Quotation" type="object" class="btn-primary" invisible="not user_is_pm or design_status != 'approved' or has_confirmed_quotation"/>
+                    <button name="action_create_installation" string="Create Installation" type="object" class="btn-primary" invisible="not user_is_pm or design_status != 'approved' or installation_count &gt; 0 or not has_confirmed_quotation"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" class="btn-secondary" invisible="not user_is_pm or design_status == 'draft'"/>
+                    <button name="%(sp_solar_management.action_report_solar_design)d" string="Print Design" type="action" class="btn-secondary"/>
+                    <field name="design_status" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="has_confirmed_quotation" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_project"
+                                icon="fa-tasks"
+                                invisible="not user_is_pm or project_count == 0">
+                            <field name="project_count" widget="statinfo" string="Project"/>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_quotations"
+                                icon="fa-usd"
+                                invisible="not (user_is_pm or user_is_sales) or quotation_count == 0">
+                                <field name="quotation_count" widget="statinfo" string="Quotations"/>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_installation"
+                                icon="fa-wrench"
+                                invisible="not (user_is_pm or user_is_tech) or installation_count == 0">
+                            <field name="installation_count" widget="statinfo" string="Installations"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="design_number" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id" readonly="design_status != 'draft'"/>
+                            <field name="lead_id" readonly="design_status != 'draft'"/>
+                            <field name="inspection_id" readonly="design_status != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="template_id" readonly="design_status != 'draft'"/>
+                            <field name="contract_demand_kw" invisible="1"/>
+                        </group>
+                    </group>
+ 
+                    <group string="Technical Design" col="2">
+                        <group>
+                            <field name="system_size" readonly="design_status != 'draft'"/>
+                            <field name="expected_generation_kwh_month" readonly="design_status != 'draft'"/>
+                            <field name="current_electricity_consumption"/>
+                        </group>
+                        <group>
+                            <field name="system_type" readonly="design_status != 'draft'"/>
+                            <field name="solar_panel_type" readonly="design_status != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="ROI Analysis" name="roi_analysis">
+                            <group string="Financial Analysis &amp; Investment Return">
+                                <group>
+                                    <field name="total_system_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="vat_percent"/>
+                                    <field name="vat_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="system_lifetime"/>
+                                    <field name="lifetime_savings" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                                <group>
+                                    <field name="electricity_rate" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="monthly_savings_kwh"/>
+                                    <field name="monthly_savings" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="annual_savings" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="payback_period"/>
+                                    <field name="roi_percent"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Solar Panel" name="solar_panels">
+                            <field name="solar_panel_line_ids" context="{'default_line_type': 'solar_panel'}" nolabel="1" readonly="design_status != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="True"/>
+                                    <field name="name" column_invisible="True"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="subtotal" readonly="1" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Battery" name="batteries">
+                            <field name="battery_line_ids" context="{'default_line_type': 'battery'}" nolabel="1" readonly="design_status != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="True"/>
+                                    <field name="name" column_invisible="True"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="subtotal" readonly="1" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Inverter" name="inverters">
+                            <field name="inverter_line_ids" context="{'default_line_type': 'inverter'}" nolabel="1" readonly="design_status != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="True"/>
+                                    <field name="name" column_invisible="True"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="subtotal" readonly="1" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </list> 
+                            </field>
+                        </page>
+                        <page string="Others Equipment" name="other_components">
+                            <field name="other_line_ids" context="{'default_line_type': 'other'}" nolabel="1" readonly="design_status != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type" column_invisible="True"/>
+                                    <field name="name" column_invisible="True"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="subtotal" readonly="1" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Installation &amp; Transport Cost" name="installation_transport">
+                            <group col="2">
+                                <group string="Installation Requirements">
+                                    <field name="installation_cost" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="design_status != 'draft'"/>
+                                </group>
+                                <group string="Transport Details">
+                                    <field name="transportation_distance_km" readonly="design_status != 'draft'"/>
+                                    <field name="transport_cost" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="design_status != 'draft'"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Project Tasks" name="project_tasks">
+                            <field name="task_ids" nolabel="1" readonly="design_status != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" string="Title"/>
+                                    <field name="user_ids" widget="many2many_avatar_user" string="Assignees"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Design plans" name="design_documents">
+                            <field name="attachment_ids" widget="many2many_binary" string="Documents" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_solar_design_document_list" model="ir.ui.view">
+        <field name="name">solar.design.document.list</field>
+        <field name="model">solar.design.document</field>
+        <field name="arch" type="xml">
+            <list string="Design Plans" editable="bottom">
+                <field name="name"/>
+                <field name="document_file" filename="document_filename"/>
+                <field name="document_filename" column_invisible="True"/>
+                <button name="action_view_document" type="object" string="View" class="btn-primary" icon="fa-eye" invisible="not document_file"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_design_document_form" model="ir.ui.view">
+        <field name="name">solar.design.document.form</field>
+        <field name="model">solar.design.document</field>
+        <field name="arch" type="xml">
+            <form string="Design Plan">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="document_file" filename="document_filename"/>
+                            <field name="document_filename" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+    <record id="action_solar_design" model="ir.actions.act_window">
+        <field name="name">Solar Designs</field>
+        <field name="res_model">solar.design</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_solar_design_search"/>
+    </record>
+
+    <menuitem id="menu_solar_design"
+              name="Designs"
+              parent="menu_solar_energy_root"
+              action="action_solar_design"
+              groups="sp_solar_management.group_solar_technician"
+              sequence="5"/>
+</thrive>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="view_crm_lead_solar_document_form" model="ir.ui.view">
+        <field name="name">crm.lead.solar.document.form</field>
+        <field name="model">crm.lead.solar.document</field>
+        <field name="arch" type="xml">
+            <form string="Lead Document">
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="document_file" filename="document_filename" string="Upload File"/>
+                        <field name="document_filename" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_solar_government_approval_search" model="ir.ui.view">
+        <field name="name">solar.government.approval.search</field>
+        <field name="model">solar.government.approval</field>
+        <field name="arch" type="xml">
+            <search string="SSEG Application">
+                <field name="lead_reference"/>
+                <field name="lead_id"/>
+                <field name="partner_id"/>
+                <field name="status"/>
+                <field name="application_number"/>
+                <filter name="filter_not_applied" string="Not Applied" domain="[('status', '=', 'not_applied')]"/>
+                <filter name="filter_applied" string="Applied" domain="[('status', '=', 'applied')]"/>
+                <filter name="filter_under_process" string="Under Process" domain="[('status', '=', 'under_process')]"/>
+                <filter name="filter_approved" string="Approved" domain="[('status', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="Rejected" domain="[('status', '=', 'rejected')]"/>
+                <filter name="filter_followup_today" string="Follow-up Today" domain="[('next_followup_date', '=', context_today())]"/>
+                <group>
+                    <filter name="group_status" string="Status" domain="[]" context="{'group_by': 'status'}"/>
+                    <filter name="group_followup" string="Next Follow-up Date" domain="[]" context="{'group_by': 'next_followup_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_solar_government_approval_list" model="ir.ui.view">
+        <field name="name">solar.government.approval.list</field>
+        <field name="model">solar.government.approval</field>
+        <field name="arch" type="xml">
+            <list string="SSEG Application">
+                <field name="lead_reference"/>
+                <field name="partner_id"/>
+                <field name="status" widget="badge"
+                       decoration-muted="status == 'not_applied'"
+                       decoration-info="status == 'applied'"
+                       decoration-warning="status == 'under_process'"
+                       decoration-success="status == 'approved'"
+                       decoration-danger="status == 'rejected'"/>
+                <field name="application_number"/>
+                <field name="next_followup_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_government_approval_form" model="ir.ui.view">
+        <field name="name">solar.government.approval.form</field>
+        <field name="model">solar.government.approval</field>
+        <field name="arch" type="xml">
+            <form string="SSEG Application">
+                <header>
+                    <field name="user_is_sales" invisible="1"/>
+                    <field name="user_is_pm" invisible="1"/>
+                    <field name="user_is_admin" invisible="1"/>
+                    <button name="action_mark_submitted"
+                            string="Mark as Submitted"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not (user_is_sales or user_is_pm) or status != 'not_applied'"/>
+                    <button name="action_mark_under_process"
+                            string="Under Process"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not (user_is_sales or user_is_pm) or status != 'applied'"/>
+                    <button name="action_mark_approved"
+                            string="Approved"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not (user_is_sales or user_is_pm) or status != 'under_process'"/>
+                    <button name="action_mark_rejected"
+                            string="Rejected"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="not (user_is_sales or user_is_pm) or status != 'under_process'"/>
+                    <button name="action_create_installation"
+                            string="Create Installation"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not user_is_admin or status != 'approved' or installation_count &gt; 0"/>
+                    <field name="status" widget="statusbar" statusbar_visible="not_applied,applied,under_process,approved"/>
+                </header>
+                <sheet>
+                    <field name="installation_count" invisible="1"/>
+                    <field name="project_id" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_lead"
+                                icon="fa-handshake-o"
+                                invisible="not lead_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Lead</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_project"
+                                icon="fa-tasks"
+                                invisible="not user_is_pm or not project_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Project</span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="lead_id" string="Lead ID" domain="[('solar_reference', 'not in', [False, 'New'])]"/>
+                            <field name="partner_id"/>
+                            <field name="application_date"/>
+                        </group>
+                        <group>
+                            <field name="application_number"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Documents" name="lead_documents">
+                            <field name="document_line_ids" nolabel="1">
+                                <list create="false" delete="false">
+                                    <field name="name" string="Document Name"/>
+                                    <button name="action_view_document"
+                                            string="View"
+                                            type="object"
+                                            class="btn btn-secondary btn-sm"
+                                            invisible="not document_file"/>
+                                    <button name="action_download_document"
+                                            string="Download"
+                                            type="object"
+                                            class="btn btn-primary btn-sm"
+                                            invisible="not document_file"/>
+                                    <field name="document_file" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_government_approval" model="ir.actions.act_window">
+        <field name="name">SSEG Applications</field>
+        <field name="res_model">solar.government.approval</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_solar_government_approval_search"/>
+    </record>
+
+    <menuitem id="menu_solar_government_approval"
+              name="SSEG Application"
+              parent="menu_solar_energy_root"
+              action="action_solar_government_approval"
+              groups="sp_solar_management.group_solar_sales"
+              sequence="6"/>
+</thrive>

@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+
+    <!-- ===================== SURVEY TEAM ===================== -->
+
+    <!-- LIST -->
+    <record id="view_solar_survey_team_list" model="ir.ui.view">
+        <field name="name">solar.survey.team.list</field>
+        <field name="model">solar.survey.team</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="team_project"/>
+                <field name="manager_id"/>
+                <field name="company_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM -->
+    <record id="view_solar_survey_team_form" model="ir.ui.view">
+        <field name="name">solar.survey.team.form</field>
+        <field name="model">solar.survey.team</field>
+        <field name="arch" type="xml">
+            <form string="Survey Team">
+                <sheet>
+
+                    <!-- TITLE -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <!-- INFO -->
+                    <group>
+                        <group>
+                            <field name="team_project"/>
+                        </group>
+                        <group>
+                            <field name="manager_id"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+
+                    <!-- MEMBERS -->
+                    <notebook>
+                        <page string="Team Members">
+
+                            <field name="member_ids"
+                                   widget="many2many_kanban"
+                                   options="{'no_create': False}">
+
+                                <kanban create="true" quick_create="false">
+                                    <control>
+                                        <create string="Add"/>
+                                    </control>
+
+                                    <templates>
+
+                                        <!-- MEMBER CARD -->
+                                        <t t-name="card">
+                                            <div class="o_kanban_card d-flex align-items-center mb-2">
+
+                                                <!-- Avatar -->
+                                                <div class="o_kanban_image me-2">
+                                                    <field name="image_128"
+                                                           widget="image"
+                                                           class="rounded-circle"
+                                                           style="width:40px;height:40px;"/>
+                                                </div>
+
+                                                <!-- Info -->
+                                                <div>
+                                                    <div>
+                                                        <strong>
+                                                            <field name="name"/>
+                                                        </strong>
+                                                    </div>
+                                                    <div class="text-muted">
+                                                        <field name="email"/>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </t>
+
+                                    </templates>
+
+                                </kanban>
+
+                            </field>
+
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_survey_team" model="ir.actions.act_window">
+        <field name="name">Survey Teams</field>
+        <field name="res_model">solar.survey.team</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!-- ===================== INSTALLATION TEAM ===================== -->
+
+    <record id="view_solar_installation_team_list" model="ir.ui.view">
+        <field name="name">solar.installation.team.list</field>
+        <field name="model">solar.installation.team</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="manager_id"/>
+                <field name="coordinator_id"/>
+                <field name="team_leader_id"/>
+                <field name="technician_count"/>
+                <field name="company_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_installation_team_form" model="ir.ui.view">
+        <field name="name">solar.installation.team.form</field>
+        <field name="model">solar.installation.team</field>
+        <field name="arch" type="xml">
+            <form string="Installation Team">
+                <sheet>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="manager_id"/>
+                            <field name="coordinator_id"/>
+                        </group>
+                        <group>
+                            <field name="team_leader_id"/>
+                            <field name="technician_count"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Engineers">
+
+                            <field name="engineer_ids"
+                                   widget="many2many_kanban"
+                                   options="{'no_create': False}">
+
+                                <kanban create="true" quick_create="false">
+                                    <control>
+                                        <create string="Add"/>
+                                    </control>
+                                    <templates>
+
+                                        <t t-name="card">
+                                            <div class="o_kanban_card d-flex align-items-center mb-2">
+
+                                                <div class="o_kanban_image me-2">
+                                                    <field name="image_128"
+                                                           widget="image"
+                                                           class="rounded-circle"
+                                                           style="width:40px;height:40px;"/>
+                                                </div>
+
+                                                <div>
+                                                    <strong><field name="name"/></strong>
+                                                    <div class="text-muted">
+                                                        <field name="email"/>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </t>
+
+                                    </templates>
+                                </kanban>
+
+                            </field>
+
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_installation_team" model="ir.actions.act_window">
+        <field name="name">Installation Teams</field>
+        <field name="res_model">solar.installation.team</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <!-- ===================== QA TEAM ===================== -->
+
+    <record id="view_solar_qa_team_list" model="ir.ui.view">
+        <field name="name">solar.qa.team.list</field>
+        <field name="model">solar.qa.team</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="team_project"/>
+                <field name="manager_id"/>
+                <field name="company_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_qa_team_form" model="ir.ui.view">
+        <field name="name">solar.qa.team.form</field>
+        <field name="model">solar.qa.team</field>
+        <field name="arch" type="xml">
+            <form string="QA Team">
+                <sheet>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="team_project"/>
+                        </group>
+                        <group>
+                            <field name="manager_id"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Team Members">
+
+                            <field name="member_ids"
+                                   widget="many2many_kanban"
+                                   options="{'no_create': False}">
+
+                                <kanban create="true" quick_create="false">
+                                    <control>
+                                        <create string="Add"/>
+                                    </control>
+                                    <templates>
+
+                                        <t t-name="card">
+                                            <div class="o_kanban_card d-flex align-items-center mb-2">
+
+                                                <div class="o_kanban_image me-2">
+                                                    <field name="image_128"
+                                                           widget="image"
+                                                           class="rounded-circle"
+                                                           style="width:40px;height:40px;"/>
+                                                </div>
+
+                                                <div>
+                                                    <strong><field name="name"/></strong>
+                                                    <div class="text-muted">
+                                                        <field name="email"/>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </t>
+
+                                    </templates>
+                                </kanban>
+
+                            </field>
+
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_qa_team" model="ir.actions.act_window">
+        <field name="name">QA Teams</field>
+        <field name="res_model">solar.qa.team</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</thrive>

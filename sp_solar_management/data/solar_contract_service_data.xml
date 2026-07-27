@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <data noupdate="1">
+        <record id="contract_service_panel_cleaning" model="solar.contract.service">
+            <field name="name">Panel Cleaning</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="contract_service_inverter_inspection" model="solar.contract.service">
+            <field name="name">Inverter Inspection</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="contract_service_electrical_inspection" model="solar.contract.service">
+            <field name="name">Electrical Inspection</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="contract_service_battery_inspection" model="solar.contract.service">
+            <field name="name">Battery Inspection</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="contract_service_system_health_check" model="solar.contract.service">
+            <field name="name">System Health Check</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="contract_service_emergency_support" model="solar.contract.service">
+            <field name="name">Emergency Support</field>
+            <field name="sequence">60</field>
+        </record>
+        <record id="contract_service_remote_monitoring" model="solar.contract.service">
+            <field name="name">Remote Monitoring</field>
+            <field name="sequence">70</field>
+        </record>
+    </data>
+</thrive>

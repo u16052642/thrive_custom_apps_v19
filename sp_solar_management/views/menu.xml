@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+
+    <menuitem id="menu_solar_energy_leads"
+              name="Leads"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_sales"
+              sequence="2">
+          <menuitem id="menu_crm_lead_all_leads"
+                name="All Leads"
+                action="crm.crm_lead_all_leads"
+                sequence="1"/>
+          <menuitem id="menu_solar_energy_my_pipeline"
+                name="My Pipeline"
+                action="crm.action_your_pipeline"
+                sequence="5"/>
+    </menuitem>
+
+    <menuitem id="menu_solar_project"
+              name="Projects"
+              parent="menu_solar_energy_root"
+              action="project.open_view_project_all"
+              groups="sp_solar_management.group_solar_project_manager,sp_solar_management.group_solar_technician,sp_solar_management.group_solar_manager"
+              sequence="3"/>
+
+    <menuitem id="menu_solar_teams_root"
+              name="Teams"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_project_manager"
+              sequence="90">
+        <menuitem id="menu_solar_survey_team"
+                  name="Survey Teams"
+                  action="action_solar_survey_team"
+                  sequence="1"/>
+        <menuitem id="menu_solar_installation_team"
+                  name="Installation Teams"
+                  action="action_solar_installation_team"
+                  sequence="2"/>
+    </menuitem>
+
+
+    <menuitem id="menu_solar_energy_sales"
+              name="Sales"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_sales"
+              sequence="10">
+            <menuitem id="menu_sale_quotations"
+                action="sale.action_quotations_with_onboarding"
+                sequence="10"/>
+            <menuitem id="menu_sale_order"
+                name="Orders"
+                action="sale.action_orders"
+                sequence="20"/>
+    </menuitem>
+
+    <menuitem id="menu_solar_energy_invoicing_root"
+              name="Accounting"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_finance"
+              sequence="11">
+        <menuitem id="menu_solar_energy_invoices"
+                  name="Invoices"
+                  action="account.action_move_out_invoice_type"
+                  sequence="1"/>
+        <menuitem id="menu_solar_energy_credit_notes"
+                  name="Credit Notes"
+                  action="account.action_move_out_refund_type"
+                  sequence="2"/>
+        <menuitem id="menu_solar_energy_payments"
+                  name="Payments"
+                  action="account.action_account_payments"
+                  sequence="3"/>
+        <menuitem id="menu_solar_energy_billing"
+                  name="Energy Billing"
+                  action="action_solar_energy_billing"
+                  sequence="4"/>
+    </menuitem>
+
+    <menuitem id="menu_solar_energy_purchase"
+              name="Purchase"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_manager,sp_solar_management.group_solar_office_manager,sp_solar_management.group_solar_finance"
+              sequence="12">
+        <menuitem id="menu_solar_purchase_rfq"
+                  name="Requests for Quotation"
+                  action="purchase.purchase_rfq"
+                  sequence="10"/>
+        <menuitem id="menu_solar_purchase_orders"
+                name="Purchase Orders"
+                action="purchase.purchase_form_action"
+                sequence="20"/>
+    </menuitem>
+
+    <menuitem id="menu_solar_energy_inventory_root"
+              name="Inventory"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_office_manager,sp_solar_management.group_solar_finance"
+              sequence="14">
+        <menuitem id="menu_solar_energy_products"
+                  name="Products"
+                  action="stock.product_template_action_product"
+                  sequence="1"/>
+        <menuitem id="menu_solar_energy_receipts"
+                  name="Receipts"
+                  action="stock.action_picking_tree_incoming"
+                  sequence="2"/>
+        <menuitem id="menu_solar_energy_deliveries"
+                  name="Deliveries"
+                  action="stock.action_picking_tree_outgoing"
+                  sequence="3"/>
+    </menuitem>
+
+    <menuitem id="menu_solar_energy_contacts"
+              name="Contacts"
+              parent="menu_solar_energy_root"
+              action="contacts.action_contacts"
+              groups="sp_solar_management.group_solar_manager"
+              sequence="105"/>
+
+    <menuitem id="menu_solar_maintenance_root"
+              name="Maintenance"
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_technician,sp_solar_management.group_solar_project_manager,sp_solar_management.group_solar_manager"
+              sequence="9">
+        <menuitem id="menu_solar_maintenance_equipments"
+                  name="Equipments"
+                  action="maintenance.hr_equipment_action"
+                  sequence="5"/>
+        <menuitem id="menu_solar_maintenance_requests"
+                  name="Maintenance Requests"
+                  action="maintenance.hr_equipment_request_action"
+                  sequence="10"/>
+        <menuitem id="menu_solar_maintenance_alerts"
+                  name="Alerts"
+                  action="sp_solar_management.action_solar_installation_alert"
+                  sequence="20"/>
+    </menuitem>
+
+
+
+    <menuitem id="menu_solar_warranty_documents_root"
+              name="Warranty &amp; Documents "
+              parent="menu_solar_energy_root"
+              groups="sp_solar_management.group_solar_manager,sp_solar_management.group_solar_office_manager,sp_solar_management.group_solar_project_manager"
+              sequence="20">
+        <menuitem id="menu_solar_warranty_claims"
+                  name="Warranty"
+                  action="sp_solar_management.action_solar_warranty_claim"
+                  sequence="10"/>
+        <menuitem id="menu_solar_warranty_documents"
+                  name="Documents"
+                  action="sp_solar_management.action_solar_installation_document"
+                  sequence="20"/>
+    </menuitem>
+
+    <menuitem id="menu_solar_document_type_config"
+              name="Document Type"
+              parent="menu_solar_energy_configuration"
+              action="sp_solar_management.action_solar_document_type"
+              sequence="35"/>
+</thrive>

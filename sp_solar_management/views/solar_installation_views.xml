@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thrive>
+    <record id="seq_solar_installation" model="ir.sequence">
+        <field name="name">Solar Installation</field>
+        <field name="code">solar.installation</field>
+        <field name="prefix">INS/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_solar_installation_search" model="ir.ui.view">
+        <field name="name">solar.installation.search</field>
+        <field name="model">solar.installation</field>
+        <field name="arch" type="xml">
+            <search string="Installations">
+                <field name="installation_id"/>
+                <field name="lead_id"/>
+                <field name="design_id"/>
+                <field name="partner_id"/>
+                <field name="team_id"/>
+                <field name="assigned_engineer_id"/>
+                <field name="subcontractor_id"/>
+                <separator/>
+                <filter name="filter_planning" string="Planning" domain="[('dashboard_status', '=', 'planning')]"/>
+                <filter name="filter_in_progress" string="In Progress" domain="[('dashboard_status', '=', 'in_progress')]"/>
+                <filter name="filter_completed" string="Completed" domain="[('dashboard_status', '=', 'completed')]"/>
+                <separator/>
+                <filter name="filter_in_house" string="Internal Team" domain="[('installation_type', '=', 'in_house')]"/>
+                <filter name="filter_subcontracted" string="Subcontractor" domain="[('installation_type', '=', 'subcontracted')]"/>
+                <group>
+                    <filter name="group_status" string="Status" domain="[]" context="{'group_by': 'dashboard_status'}"/>
+                    <filter name="group_type" string="Execution Type" domain="[]" context="{'group_by': 'installation_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_solar_installation_list" model="ir.ui.view">
+        <field name="name">solar.installation.list</field>
+        <field name="model">solar.installation</field>
+        <field name="arch" type="xml">
+            <list string="Installations">
+                <field name="installation_id"/>
+                <field name="partner_id"/>
+                <field name="design_id"/>
+                <field name="dashboard_status" widget="badge"
+                       decoration-info="dashboard_status == 'planning'"
+                       decoration-warning="dashboard_status == 'in_progress'"
+                       decoration-success="dashboard_status == 'completed'"/>
+                <field name="system_size_kw"/>
+                <field name="expected_generation_kwh_month"/>
+                <field name="installation_type"/>
+                <field name="team_id" optional="hide"/>
+                <field name="current_assigned_person"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_solar_installation_form" model="ir.ui.view">
+        <field name="name">solar.installation.form</field>
+        <field name="model">solar.installation</field>
+        <field name="arch" type="xml">
+            <form string="Solar Installation">
+                <header>
+                    <field name="user_is_tech" invisible="1"/>
+                    <field name="user_is_pm" invisible="1"/>
+                    <field name="user_is_sales" invisible="1"/>
+                    <field name="user_is_finance" invisible="1"/>
+                    <button name="action_update_progress" string="Start" type="object" class="btn-primary" invisible="not (user_is_tech or user_is_pm) or installation_status != 'planning'"/>
+                    <button name="action_mark_stage_complete" string="Complete" type="object" class="btn-primary" invisible="not user_is_pm or installation_status != 'in_progress'"/>
+                    <button name="action_create_contract" string="Create Contract" type="object" class="btn-secondary" invisible="not user_is_pm or installation_status != 'completed' or contract_count &gt; 0"/>
+                    <field name="installation_status" widget="statusbar" statusbar_visible="planning,in_progress,completed" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_project"
+                                icon="fa-tasks"
+                                invisible="not user_is_pm or project_count == 0">
+                            <field name="project_count" widget="statinfo" string="Project"/>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_contracts"
+                                icon="fa-pencil-square-o"
+                                invisible="not (user_is_sales or user_is_pm or user_is_finance) or contract_count == 0">
+                            <field name="contract_count" widget="statinfo" string="Contracts"/>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_maintenance"
+                                icon="fa-wrench"
+                                invisible="not (user_is_tech or user_is_pm)">
+                            <field name="maintenance_count" widget="statinfo" string="Maintenance"/>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_documents"
+                                icon="fa-file-text-o">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+                        <button class="oe_stat_button"
+                                type="object"
+                                name="action_view_alerts"
+                                icon="fa-exclamation-triangle">
+                            <field name="alert_count" widget="statinfo" string="Alerts"/>
+                        </button>
+                    </div>
+                    <field name="contract_count" invisible="1"/>
+                    <field name="maintenance_count" invisible="1"/>
+                    <field name="document_count" invisible="1"/>
+                    <field name="alert_count" invisible="1"/>
+
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="installation_id" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group string="PROJECT INFORMATION">
+                        <group>
+                            <field name="project_id" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="design_id" readonly="1"/>
+                            <field name="sale_order_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="location"/>
+                        </group>
+                    </group>
+
+
+                    <group string="EXECUTION TYPE">
+                        <group>
+                            <field name="installation_type" widget="radio" options="{'horizontal': true}"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    
+                    <group invisible="installation_type != 'in_house'">
+                        <group>
+                            <field name="team_id"/>
+                            <field name="project_manager_id"/>
+                        </group>
+                        <group>
+                            <field name="team_engineer_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+
+                    <group invisible="installation_type != 'subcontracted'">
+                        <group>
+                            <field name="subcontractor_id"/>
+                            <field name="contact_person"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                        </group>
+                    </group>
+
+                    <group string="SCHEDULE">
+                        <group>
+                            <field name="planned_start_date"/>
+                            <field name="planned_end_date"/>
+                        </group>
+                        <group>
+                            <field name="actual_start_date"/>
+                            <field name="actual_end_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Images" name="work_photos">
+                            <field name="photo_ids" mode="kanban" context="{'default_installation_id': id}" class="o_solar_site_images_kanban" readonly="installation_status == 'planning'">
+                                <kanban class="o_kanban_mobile" quick_create="false" create="true">
+                                    <field name="name"/>
+                                    <field name="stage"/>
+                                    <field name="photo_type"/>
+                                    <field name="image"/>
+                                    <control>
+                                        <create string="Add"/>
+                                    </control>
+                                    <templates>
+                                        <t t-name="card">
+                                            <div class="oe_kanban_global_click p-1">
+                                                <div class="fw-bold mb-1">
+                                                    <field name="stage" invisible="not stage"/>
+                                                    <field name="photo_type" invisible="not photo_type"/>
+                                                    <field name="name" invisible="stage or photo_type"/>
+                                                </div>
+                                                <div>
+                                                    <field name="image" widget="image" class="img img-fluid" options="{'size': [260, 180]}"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_solar_installation" model="ir.actions.act_window">
+        <field name="name">Installations</field>
+        <field name="res_model">solar.installation</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_solar_installation_search"/>
+    </record>
+
+    <menuitem id="menu_solar_installation"
+              name="Installations"
+              parent="menu_solar_energy_root"
+              action="action_solar_installation"
+              groups="sp_solar_management.group_solar_technician"
+              sequence="7"/>
+</thrive>

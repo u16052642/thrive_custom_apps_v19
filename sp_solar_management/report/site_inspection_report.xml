@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thrive>
+    <record id="action_report_solar_site_inspection" model="ir.actions.report">
+        <field name="name">Site Inspection Report</field>
+        <field name="model">solar.site.inspection</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sp_solar_management.report_site_inspection_template</field>
+        <field name="report_file">sp_solar_management.report_site_inspection_template</field>
+        <field name="print_report_name">'Site_Inspection_%s' % (object.name or 'New')</field>
+        <field name="binding_model_id" ref="sp_solar_management.model_solar_site_inspection"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_site_inspection_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <t t-set="o" t-value="doc"/>
+                    <div class="page">
+                        <style>
+                            .page {
+                                color: #1e293b;
+                            }
+                            .report-header-banner {
+                                background-color: #f1f5f9;
+                                text-align: center;
+                                font-weight: bold;
+                                font-size: 20px;
+                                padding: 12px 0;
+                                margin: 15px 0 25px;
+                                color: #334155;
+                                border-radius: 4px;
+                                letter-spacing: 1px;
+                                text-transform: uppercase;
+                                border: 1px solid #e2e8f0;
+                                page-break-inside: avoid !important;
+                                page-break-after: avoid !important;
+                                break-inside: avoid !important;
+                                break-after: avoid !important;
+                            }
+                            .section-title {
+                                font-weight: bold;
+                                font-size: 14px;
+                                color: #2f353dff;
+                                border-bottom: 2px solid #e2e8f0;
+                                padding-bottom: 4px;
+                                margin-top: 18px;
+                                margin-bottom: 12px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                page-break-after: avoid;
+                                break-after: avoid;
+                            }
+                            .report-section {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                                margin-bottom: 10px;
+                            }
+                            .report-section .row.info-row {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                            }
+                            .info-row {
+                                margin-bottom: 6px;
+                                font-size: 13px;
+                                line-height: 1.5;
+                                page-break-inside: avoid;
+                                break-inside: avoid;
+                            }
+                            .info-label {
+                                font-weight: 600;
+                                color: #64748b;
+                                display: inline-block;
+                                width: 45%;
+                                vertical-align: top;
+                            }
+                            .info-value {
+                                color: #1e293b;
+                                font-weight: 500;
+                                display: inline-block;
+                                width: 50%;
+                                vertical-align: top;
+                            }
+                            .address-block {
+                                line-height: 1.4;
+                            }
+                            .image-grid {
+                                overflow: hidden;
+                                margin-top: 15px;
+                            }
+                            .image-item {
+                                float: left;
+                                width: 23%;
+                                padding: 6px;
+                                margin-right: 2%;
+                                margin-bottom: 15px;
+                                box-sizing: border-box;
+                                text-align: center;
+                                border: 1px solid #e2e8f0;
+                                border-radius: 4px;
+                                background-color: #fff;
+                            }
+                            .image-item img {
+                                width: 100%;
+                                height: 120px;
+                                object-fit: cover;
+                                border-radius: 2px;
+                            }
+                            .image-label {
+                                font-size: 12px;
+                                font-weight: 600;
+                                margin-top: 6px;
+                                color: #334155;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+                            table.checklist-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 15px;
+                                font-size: 14px;
+                                border: 1px solid #e2e8f0;
+                                border-radius: 4px;
+                                overflow: hidden;
+                            }
+                            table.checklist-table th {
+                                background-color: #f1f5f9;
+                                border-bottom: 2px solid #cbd5e1;
+                                text-align: left;
+                                padding: 10px;
+                                font-weight: bold;
+                                color: #1e293b;
+                            }
+                            table.checklist-table td {
+                                padding: 10px;
+                                border-bottom: 1px solid #e2e8f0;
+                                vertical-align: top;
+                                color: #334155;
+                            }
+                            .remarks-text {
+                                font-size: 14px;
+                                margin-top: 10px;
+                                padding: 12px;
+                                background-color: #f8fafc;
+                                border-left: 4px solid #3b82f6;
+                                line-height: 1.6;
+                                color: #334155;
+                            }
+                            .row.info-row {
+                                margin-bottom: 8px;
+                            }
+                            .col-6 {
+                                padding-right: 15px;
+                                page-break-inside: avoid;
+                                break-inside: avoid;
+                            }
+                            .keep-together {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                            }
+                            .report-block {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                                margin-top: 18px;
+                            }
+                            .report-block .report-header-banner {
+                                margin-top: 0 !important;
+                            }
+                        </style>
+                        <div class="report-header-banner">
+                            Site Inspection
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Customer Details</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Customer:</span> <span class="info-value" t-field="doc.customer_name"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Customer Category:</span> <span class="info-value" t-field="doc.customer_category"/>
+                                </div>
+                            </div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Email:</span> <span class="info-value" t-field="doc.customer_email"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Service Type:</span> <span class="info-value" t-field="doc.service_type"/>
+                                </div>
+                            </div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Phone:</span> <span class="info-value" t-field="doc.customer_phone"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Contract Demand:</span> <span class="info-value" t-field="doc.contract_demand_kw"/> <span t-if="doc.contract_demand_kw">kW</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Electricity Details</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Connection Type:</span> <span class="info-value" t-field="doc.connection_type"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Consumer No:</span> <span class="info-value" t-field="doc.consumer_no"/>
+                                </div>
+                            </div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Existing Connection:</span> <span class="info-value" t-field="doc.existing_connection"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Monthly Electric Bill:</span> <span class="info-value" t-field="doc.monthly_electric_bill"/>
+                                </div>
+                            </div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Existing Supply Volts:</span> <span class="info-value" t-field="doc.existing_supply_volts"/> <span t-if="doc.existing_supply_volts">v</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Monthly Electricity Consumption:</span> <span class="info-value" t-field="doc.monthly_electricity_consumption"/> <span t-if="doc.monthly_electricity_consumption">kWh</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Site Information</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Site Usage:</span> <span class="info-value" t-field="doc.property_type"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Type of Property:</span> <span class="info-value" t-field="doc.roof_type"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Age of Property:</span> <span class="info-value" t-field="doc.property_age_years"/> <span t-if="doc.property_age_years">Years</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <table style="width: 100%; border: none !important;" class="table-borderless">
+                                        <tr style="border: none !important;">
+                                            <td class="info-label" style="vertical-align: top; width: 80px; padding: 0; border: none !important; border-top: none !important;">Address:</td>
+                                            <td class="address-block info-value" style="padding: 0; border: none !important; border-top: none !important;">
+                                                <div t-if="doc.site_street"><span t-field="doc.site_street"/></div>
+                                                <div t-if="doc.site_street2"><span t-field="doc.site_street2"/></div>
+                                                <div>
+                                                    <span t-if="doc.site_city" t-field="doc.site_city"/> 
+                                                    <span t-if="doc.site_state_id" t-field="doc.site_state_id"/> 
+                                                    <span t-if="doc.site_zip" t-field="doc.site_zip"/>
+                                                </div>
+                                                <div t-if="doc.site_country_id"><span t-field="doc.site_country_id"/></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Site Location</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <span class="info-label">Latitude:</span> <span class="info-value" t-field="doc.site_latitude"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="info-label">Longitude:</span> <span class="info-value" t-field="doc.site_longitude"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Survey Team Details</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Survey Team:</span> <span class="info-value" t-field="doc.survey_team_id"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Survey Member:</span> <span class="info-value" t-field="doc.survey_member_id"/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Date of Inspection:</span> <span class="info-value" t-field="doc.inspection_date"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Salesperson:</span> <span class="info-value" t-field="doc.salesperson_id"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Company:</span> <span class="info-value" t-field="doc.company_id"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Technical Recommendation</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Max Installable Capacity:</span> <span class="info-value" t-field="doc.max_installable_capacity_kw"/> <span t-if="doc.max_installable_capacity_kw">kW</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Recommended System Size:</span> <span class="info-value" t-field="doc.recommended_system_size_kw"/> <span t-if="doc.recommended_system_size_kw">kW</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Expected Generation:</span> <span class="info-value" t-field="doc.expected_generation_kwh_month"/> <span t-if="doc.expected_generation_kwh_month">kWh/month</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">System Type:</span> <span class="info-value" t-field="doc.system_type"/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Installation Feasible:</span> <span class="info-value" t-field="doc.installation_feasible"/>
+                                    </div>
+                                    <div class="info-row" t-if="doc.installation_feasible == 'no'">
+                                        <span class="info-label">Feasibility Reason:</span> <span class="info-value" t-field="doc.feasibility_reason"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Estimated Project Cost:</span> <span class="info-value" t-field="doc.estimated_project_cost"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Structural Analysis</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Roof Load Capacity OK:</span> <span class="info-value" t-field="doc.roof_load_capacity_ok"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Structure Reinforcement Required:</span> <span class="info-value" t-field="doc.structure_reinforcement_required"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Mounting Structure Type:</span> <span class="info-value" t-field="doc.mounting_structure_type"/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Safety Notes:</span> <span class="info-value" t-field="doc.safety_notes"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Electrical Analysis</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Current Peak Load:</span> <span class="info-value" t-field="doc.peak_load_kw"/> <span t-if="doc.peak_load_kw">kW</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Backup Requirement:</span> <span class="info-value" t-field="doc.backup_requirement"/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Battery Required:</span> <span class="info-value" t-field="doc.battery_required"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Shadow Analysis</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Shadow Present:</span> <span class="info-value" t-field="doc.shadow_present"/>
+                                    </div>
+                                    <div class="info-row" t-if="doc.shadow_present == 'yes'">
+                                        <span class="info-label">Shadow Percentage:</span> <span class="info-value" t-field="doc.shadow_percentage"/> <span t-if="doc.shadow_percentage">%</span>
+                                    </div>
+                                    <div class="info-row" t-if="doc.shadow_present == 'yes'">
+                                        <span class="info-label">Obstruction Type:</span> <span class="info-value" t-field="doc.obstruction_type"/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Orientation:</span> <span class="info-value" t-field="doc.orientation"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section keep-together">
+                            <div class="section-title">Approval Workflow</div>
+                            <div class="row info-row">
+                                <div class="col-6">
+                                    <div class="info-row">
+                                        <span class="info-label">Portal Submission Date:</span> <span class="info-value" t-field="doc.portal_submission_date"/>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Portal Submitted By:</span> <span class="info-value" t-field="doc.portal_submitted_by_id"/>
+                                    </div>
+                                    <div class="info-row" t-if="doc.state == 'approved'">
+                                        <span class="info-label">Approved By:</span> <span class="info-value" t-field="doc.approved_by_id"/>
+                                    </div>
+                                    <div class="info-row" t-if="doc.state == 'approved'">
+                                        <span class="info-label">Approved Date:</span> <span class="info-value" t-field="doc.approved_date"/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-row" t-if="doc.state == 'rejected'">
+                                        <span class="info-label">Rejected By:</span> <span class="info-value" t-field="doc.rejected_by_id"/>
+                                    </div>
+                                    <div class="info-row" t-if="doc.state == 'rejected'">
+                                        <span class="info-label">Rejected Date:</span> <span class="info-value" t-field="doc.rejected_date"/>
+                                    </div>
+                                    <div class="info-row" t-if="doc.state == 'rejected'">
+                                        <span class="info-label">Rejection Reason:</span> <span class="info-value" t-field="doc.rejection_reason"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="doc.image_ids" class="report-block">
+                            <div class="report-header-banner">
+                                Site Survey Images
+                            </div>
+                            <div class="image-grid" style="margin-top: 15px;">
+                                <t t-foreach="doc.image_ids" t-as="img">
+                                    <div class="image-item" style="padding: 0 10px 10px 0; width: 20%; float: left; text-align: left;">
+                                        <img t-if="img.image" t-att-src="image_data_uri(img.image)" alt="Site Photo" style="width: 100%; height: 90px; object-fit: cover; display: block;"/>
+                                        <div class="image-label" style="font-size: 12px; margin-top: 4px; color: #333; line-height: 1.2;">
+                                            <span t-field="img.name"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                            <div style="clear: both;"/>
+                        </div>
+
+                        <div t-if="doc.checklist_line_ids" class="report-block">
+                            <div class="report-header-banner">
+                                Site Checklists
+                            </div>
+                            <table class="checklist-table" style="border: none; margin-top: 5px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%; border: none; padding: 4px 5px; font-weight: bold; color: #333;">Check Name</th>
+                                        <th style="width: 60%; border: none; padding: 4px 5px; font-weight: bold; color: #333;">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.checklist_line_ids" t-as="line">
+                                        <td style="padding: 4px 5px; border: none; color: #333;">
+                                            <t t-if="line.is_ok">
+                                                <span style="color: #10b981; margin-right: 8px; font-size: 11px; font-weight: bold;">&#10004;</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span style="color: #ef4444; margin-right: 8px; font-size: 11px; font-weight: bold;">&#10006;</span>
+                                            </t>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td style="padding: 4px 5px; border: none; color: #333;"><span t-field="line.description"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div t-if="doc.site_remarks" class="report-block keep-together">
+                            <div class="report-header-banner">
+                                Site Remarks
+                            </div>
+                            <div class="remarks-text" style="color: #333; margin-top: 5px;">
+                                <span t-field="doc.site_remarks"/>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</thrive>
